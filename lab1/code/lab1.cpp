@@ -207,6 +207,7 @@ void execute(std::vector<int>& V, const std::vector<int>& res) {
 // Iterative algorithm
 void TND004::stable_partition_iterative(std::vector<int>& V, std::function<bool(int)> p) {
     // IMPLEMENT before Lab1 HA
+    //int mid = V.size() / 2;? eller vill vi ha en pointer
     //stable_partition(std::begin(V), std::end(V), p);//hur dela upp
 
 }
