@@ -207,6 +207,8 @@ void execute(std::vector<int>& V, const std::vector<int>& res) {
 // Iterative algorithm
 void TND004::stable_partition_iterative(std::vector<int>& V, std::function<bool(int)> p) {
     // IMPLEMENT before Lab1 HA
+    //stable_partition(std::begin(V), std::end(V), p);//hur dela upp
+
 }
 
 // Auxiliary function that performs the stable partition recursively
@@ -217,6 +219,8 @@ std::vector<int>::iterator TND004::stable_partition(std::vector<int>::iterator f
                                                     std::vector<int>::iterator last,
                                                     std::function<bool(int)> p) {
     // IMPLEMENT
+
+
 
     return first;  // delete this line
 }
