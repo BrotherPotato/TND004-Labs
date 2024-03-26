@@ -207,8 +207,14 @@ void execute(std::vector<int>& V, const std::vector<int>& res) {
 // Iterative algorithm
 void TND004::stable_partition_iterative(std::vector<int>& V, std::function<bool(int)> p) {
     // IMPLEMENT before Lab1 HA
+
     std::vector<int> trueVector;
     std::vector<int> falseVector;
+
+	//malloc using reserve to avoid reallocation? and make the code faster. 
+    //ex: trueVector.reserve(std::ssize(V));
+
+    
     for (size_t i = 0; i < std::ssize(V); i++) // V.size()
     {
         if (p(V[i])) {
@@ -219,7 +225,8 @@ void TND004::stable_partition_iterative(std::vector<int>& V, std::function<bool(
         }
     }
     //V = {trueVector, trueVector};
-    trueVector.insert(trueVector.end(), trueVector.begin(), trueVector.end()); // constant time?
+    //trueVector.insert(trueVector.end(), falseVector.begin(), falseVector.end()); // constant time? bra fråga
+    trueVector.append_range(falseVector); //same thing as above
     V = trueVector;
 
 
