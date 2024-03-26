@@ -207,8 +207,21 @@ void execute(std::vector<int>& V, const std::vector<int>& res) {
 // Iterative algorithm
 void TND004::stable_partition_iterative(std::vector<int>& V, std::function<bool(int)> p) {
     // IMPLEMENT before Lab1 HA
-    //int mid = V.size() / 2;? eller vill vi ha en pointer
-    //stable_partition(std::begin(V), std::end(V), p);//hur dela upp
+    std::vector<int> trueVector;
+    std::vector<int> falseVector;
+    for (size_t i = 0; i < std::ssize(V); i++) // V.size()
+    {
+        if (p(V[i])) {
+            trueVector.push_back(V[i]);
+        }
+        else {
+            falseVector.push_back(V[i]);
+        }
+    }
+    //V = {trueVector, trueVector};
+    trueVector.insert(trueVector.end(), trueVector.begin(), trueVector.end()); // constant time?
+    V = trueVector;
+
 
 }
 
@@ -221,7 +234,12 @@ std::vector<int>::iterator TND004::stable_partition(std::vector<int>::iterator f
                                                     std::function<bool(int)> p) {
     // IMPLEMENT
 
-
+    /*
+    vector<int>::iterator it1 = begin(V) + 1;
+    vector<int>::iterator it2 = begin(V) + 3;
+    vector<int>::iterator it3 = begin(V) + 6;
+    auto it4 = std::rotate(it1, it2, it3); // rotate the range [it1, it2, it3] so that it2 becomes the first element [it2, it1, it3]?
+    */
 
     return first;  // delete this line
 }
