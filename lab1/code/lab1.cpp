@@ -259,12 +259,18 @@ std::vector<int>::iterator TND004::stable_partition(std::vector<int>::iterator f
     */
 
     if(first == last) return first; // O(1) T(1)
+    // det här funkar inte lol
+    if (std::distance(first, last) == 2) {
+        if (p(*first) != p(*last)) {
+            std::swap(first, last);
+        }
+    }
 
     std::vector<int>::iterator mid = first + std::distance(first, last) / 2;
 
     std::vector<int>::iterator SL = stable_partition(first, mid, p);
     std::vector<int>::iterator SR = stable_partition(mid, last, p);
-    //auto it4 = std::rotate(it1, it2, it3);
+    auto it4 = std::rotate(SL, mid, SR);
 
     return first;  // delete this line
 }
