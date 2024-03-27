@@ -212,6 +212,7 @@ void TND004::stable_partition_iterative(std::vector<int>& V, std::function<bool(
     std::vector<int> falseVector; // O(1)   T(0)?
 
 	//malloc using reserve to avoid reallocation? and make the code faster. 
+    //https://en.cppreference.com/w/cpp/container/vector/reserve
     trueVector.reserve(std::ssize(V));
     falseVector.reserve(std::ssize(V));
     
@@ -229,7 +230,7 @@ void TND004::stable_partition_iterative(std::vector<int>& V, std::function<bool(
     }
     
     // complexity 4) Linear in std::distance(first, last) plus linear in the distance between pos and end of the container.
-    // T(n+n) = T(2n) = O(n)
+    // T(n+n+c) = T(2n) = O(n) c är en konstant
     trueVector.insert(trueVector.end(), falseVector.begin(), falseVector.end()); // constant time? bra fråga
     
     //trueVector.append_range(falseVector); //same thing as above O(n) 
@@ -256,6 +257,14 @@ std::vector<int>::iterator TND004::stable_partition(std::vector<int>::iterator f
     vector<int>::iterator it3 = begin(V) + 6;
     auto it4 = std::rotate(it1, it2, it3); // rotate the range [it1, it2, it3] so that it2 becomes the first element [it2, it1, it3]?
     */
+
+    if(first == last) return first; // O(1) T(1)
+
+    std::vector<int>::iterator mid = first + std::distance(first, last) / 2;
+
+    std::vector<int>::iterator SL = stable_partition(first, mid, p);
+    std::vector<int>::iterator SR = stable_partition(mid, last, p);
+    //auto it4 = std::rotate(it1, it2, it3);
 
     return first;  // delete this line
 }
