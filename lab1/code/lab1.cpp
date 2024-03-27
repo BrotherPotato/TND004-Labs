@@ -208,28 +208,32 @@ void execute(std::vector<int>& V, const std::vector<int>& res) {
 void TND004::stable_partition_iterative(std::vector<int>& V, std::function<bool(int)> p) {
     // IMPLEMENT before Lab1 HA
 
-    std::vector<int> trueVector;
-    std::vector<int> falseVector;
+    std::vector<int> trueVector;  // O(1)   T(0)?
+    std::vector<int> falseVector; // O(1)   T(0)?
 
 	//malloc using reserve to avoid reallocation? and make the code faster. 
-    //ex: trueVector.reserve(std::ssize(V));
-
+    trueVector.reserve(std::ssize(V));
+    falseVector.reserve(std::ssize(V));
     
-    for (size_t i = 0; i < std::ssize(V); i++) // V.size()
+    // whole loop O(n) T(1 + n(1+1+1+(1)+(1 or 1))) = T(i + loop(comp, size, incr, (if), (pushback) ))
+    for (size_t i = 0; i < std::ssize(V); i++) // O(n)
     {
-        if (p(V[i])) {
-            trueVector.push_back(V[i]);
+        if (p(V[i])) { // O(1 or n)  T(1+1)??
+            trueVector.push_back(V[i]); // O(1)  T(n)
+            //trueVector[0] = V[i]; // O(1)  T(n)
         }
         else {
-            falseVector.push_back(V[i]);
+            falseVector.push_back(V[i]); // O(1) T(n)
+            //falseVector[0] = V[i]; // O(1)  T(n)
         }
     }
     //V = {trueVector, trueVector};
-    //trueVector.insert(trueVector.end(), falseVector.begin(), falseVector.end()); // constant time? bra fråga
-    trueVector.append_range(falseVector); //same thing as above
-    V = trueVector;
-
-
+    trueVector.insert(trueVector.end(), falseVector.begin(), falseVector.end()); // constant time? bra fråga
+    //trueVector.append_range(falseVector); //same thing as above         O(n) or O(1) ???  T(n)
+    //copy(falseVector.begin(), falseVector.end(), std::back_inserter(trueVector));  //same thing as above  // O(n) T(n)
+    V = trueVector; // O(1) T(1)
+    //O(n) T(0+0+3n+1+n+n+n) = T(6n+1)
+    //dubbelkolla att T
 }
 
 // Auxiliary function that performs the stable partition recursively
