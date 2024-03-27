@@ -228,9 +228,13 @@ void TND004::stable_partition_iterative(std::vector<int>& V, std::function<bool(
         }
     }
     //V = {trueVector, trueVector};
+    // complexity 4) Linear in std::distance(first, last) plus linear in the distance between pos and end of the container.
+    // T(n+n)
     trueVector.insert(trueVector.end(), falseVector.begin(), falseVector.end()); // constant time? bra fråga
     //trueVector.append_range(falseVector); //same thing as above         O(n) or O(1) ???  T(n)
-    //copy(falseVector.begin(), falseVector.end(), std::back_inserter(trueVector));  //same thing as above  // O(n) T(n)
+    // std::back_inserter returns std::back_insert_iterator that uses Container::push_back().
+    // copy is of time complexity O(n), back_inserter O(1+1+n) = O(n)
+    copy(falseVector.begin(), falseVector.end(), std::back_inserter(trueVector));  //same thing as above  // O(n) T(n)
     V = trueVector; // O(1) T(1)
     //O(n) T(0+0+3n+1+n+n+n) = T(6n+1)
     //dubbelkolla att T
