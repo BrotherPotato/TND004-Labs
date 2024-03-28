@@ -257,20 +257,20 @@ std::vector<int>::iterator TND004::stable_partition(std::vector<int>::iterator f
     vector<int>::iterator it3 = begin(V) + 6;
     auto it4 = std::rotate(it1, it2, it3); // rotate the range [it1, it2, it3] so that it2 becomes the first element [it2, it1, it3]?
     */
+    std::vector<int>::iterator mid = first + std::distance(first, last) / 2;
 
     if(first == last) return first; // O(1) T(1)
-    // det här funkar inte lol
+    
     if (std::distance(first, last) == 2) {
-        if (p(*first) != p(*last)) {
-            std::swap(first, last);
+        if (p(*mid)) {
+            return mid; // add +1???
         }
+        else {
+			return mid;
+		}
     }
-
-    std::vector<int>::iterator mid = first + std::distance(first, last) / 2;
 
     std::vector<int>::iterator SL = stable_partition(first, mid, p);
     std::vector<int>::iterator SR = stable_partition(mid, last, p);
-    auto it4 = std::rotate(SL, mid, SR);
-
-    return first;  // delete this line
+    return std::rotate(SL, mid, SR);
 }
