@@ -196,12 +196,12 @@ void execute(std::vector<int>& V, const std::vector<int>& res) {
     TND004::stable_partition_iterative(V, even);
     assert(V == res);  // compare with the expected result
 
-    /*
+    
     // Uncomment for exercise 2
     std::cout << "Divide-and-conquer stable partition\n";
     TND004::stable_partition(copy_, even);
     assert(copy_ == res);  // compare with the expected result
-    */
+    
 }
 
 // Iterative algorithm
@@ -260,10 +260,11 @@ std::vector<int>::iterator TND004::stable_partition(std::vector<int>::iterator f
     std::vector<int>::iterator mid = first + std::distance(first, last) / 2;
 
     if(first == last) return first; // O(1) T(1)
+	
     
-    if (std::distance(first, last) == 2) {
-        if (p(*mid)) {
-            return mid; // add +1???
+    if (std::distance(first, last) == 2) { //[1, 2]
+		if (p(*mid)) { //if mid is even
+			return mid; // add +1??? yeeees :)) då om mid == last så kommer rotate inte modifiera vektorn
         }
         else {
 			return mid;
