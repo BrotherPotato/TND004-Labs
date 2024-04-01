@@ -266,12 +266,16 @@ std::vector<int>::iterator TND004::stable_partition(std::vector<int>::iterator f
 	
     if (distance == 1) { //[1] bara en i vektorn
 		if (p(*first)) { //if first is even
-			return last;
+			return last; //dvs rotera inte
         }
         else {
 			return first;
 		}
     }
+
+	//om det är två i vektorn så hanteras det av koden nedan
+	
+	//vette fan vad komplexiteten är dock, möjligtvis log(n) då vi delar upp vektorn i mindre delar för varje steg.
 
     std::vector<int>::iterator SL = stable_partition(first, mid, p); //jämn
     std::vector<int>::iterator SR = stable_partition(mid, last, p); //ojämn
