@@ -208,38 +208,42 @@ void execute(std::vector<int>& V, const std::vector<int>& res) {
 void TND004::stable_partition_iterative(std::vector<int>& V, std::function<bool(int)> p) {
     // IMPLEMENT before Lab1 HA
 
-    std::vector<int> trueVector;  // O(1)   T(0)?
-    std::vector<int> falseVector; // O(1)   T(0)?
+    std::vector<int> trueVector;  // O(1)   T(1)  S(1)
+    std::vector<int> falseVector; // O(1)   T(1)  S(1)
 
 	//malloc using reserve to avoid reallocation? and make the code faster. 
     //https://en.cppreference.com/w/cpp/container/vector/reserve
-    trueVector.reserve(std::ssize(V));
-    falseVector.reserve(std::ssize(V));
+    trueVector.reserve(std::ssize(V)); // O(n) T(n) S(n)
+    falseVector.reserve(std::ssize(V)); // O(n) T(n) S(n)
     
-    // whole loop O(n) T(1 + n(1+1+1+(1)+(1 or 1))) = T(i + loop(comp, size, incr, (if), (pushback) ))
-    for (size_t i = 0; i < std::ssize(V); i++) // O(n)
+    // whole loop O(n) T(1 + n(1+1+1+(5)+(2))) = T(1+10n) = T(i + loop(comp, size, incr, (if), (pushback) ))
+    for (size_t i = 0; i < std::ssize(V); i++) // O(n) S(1)
     {
-        if (p(V[i])) { // O(1 or n)  T(1+1)??
-            trueVector.push_back(V[i]); // O(1)  T(n)
-            //trueVector[0] = V[i]; // O(1)  T(n)
+		if (p(V[i])) { // O(1)  T(1+(1+1+1)+1) // if statment + (the function p has 1 for %, 1 for == 0 and 1 for return) + 1 for V[i]
+            trueVector.push_back(V[i]); // O(1)  T(1+1)
         }
         else {
-            falseVector.push_back(V[i]); // O(1) T(n)
-            //falseVector[0] = V[i]; // O(1)  T(n)
+            falseVector.push_back(V[i]); // O(1) T(1+1)
         }
     }
-    
+    {
     // complexity 4) Linear in std::distance(first, last) plus linear in the distance between pos and end of the container.
     // T(n+n+c) = T(2n) = O(n) c är en konstant
-    trueVector.insert(trueVector.end(), falseVector.begin(), falseVector.end()); // constant time? bra fråga
+    //trueVector.insert(trueVector.end(), falseVector.begin(), falseVector.end()); // constant time? bra fråga
     
     //trueVector.append_range(falseVector); //same thing as above O(n) 
     
-    // std::back_inserter returns std::back_insert_iterator that uses Container::push_back().
-    // copy is of time complexity O(n), back_inserter O(1+1+n) = O(n)
     //copy(falseVector.begin(), falseVector.end(), std::back_inserter(trueVector));  //same thing as above  // T(2n) = O(n)
-    V = trueVector; // O(1) T(1)
-    //Whole function is O(n)
+	}
+    V.clear(); // O(n) T(n)
+	// std::back_inserter returns std::back_insert_iterator that uses Container::push_back().
+	// copy is of time complexity O(n), back_inserter T(1+1+n) = O(n)
+    copy(trueVector.begin(), trueVector.end(), std::back_inserter(V));   // T(n+2+(1+1+n))) = T(4+2n) = O(n)
+    copy(falseVector.begin(), falseVector.end(), std::back_inserter(V)); // T(n+2+(1+1+n))) = T(4+2n) = O(n)
+    //Whole function is O(n) T(1+1+n+n+(1+10n)+n+4+2n+4+2n) = T(11+17n) worst case
+    //complexity: O(n) linear
+
+    //S(n) = O(2+2n) = O(n)
 }
 
 // Auxiliary function that performs the stable partition recursively
@@ -250,34 +254,43 @@ std::vector<int>::iterator TND004::stable_partition(std::vector<int>::iterator f
                                                     std::vector<int>::iterator last,
                                                     std::function<bool(int)> p) {
     // IMPLEMENT
-
-    /*
-    vector<int>::iterator it1 = begin(V) + 1;
-    vector<int>::iterator it2 = begin(V) + 3;
-    vector<int>::iterator it3 = begin(V) + 6;
-    auto it4 = std::rotate(it1, it2, it3); // rotate the range [it1, it2, it3] so that it2 becomes the first element [it2, it1, it3]?
-    */
-    auto distance = std::distance(first, last);
-    std::vector<int>::iterator mid = first + distance / 2;
-
-    if(first == last) return first; // O(1) T(1)
+    if(first == last) return first; // O(1) T(3)
 	
-	//std::cout << *mid << std::endl;
+	auto distance = std::distance(first, last); //T(n+1) = O(n)   S(1)
 	
-    if (distance == 1) { //[1] bara en i vektorn
-		if (p(*first)) { //if first is even
-			return last; //dvs rotera inte
+	//[1] bara en i vektorn
+    if (distance == 1) { //T(2) 
+		if (p(*first)) { //if first is even T(1+3+1)=T(5)
+			//move iterator, dvs do not rotate
+			return last; //T(1)
         }
         else {
-			return first;
+			return first; //T(1)
 		}
     }
-
-	//om det är två i vektorn så hanteras det av koden nedan
 	
-	//vette fan vad komplexiteten är dock, möjligtvis log(n) då vi delar upp vektorn i mindre delar för varje steg.
+	std::vector<int>::iterator mid = first + distance / 2; //T(1+1+1) = T(3) = O(1)     S(1)
 
-    std::vector<int>::iterator SL = stable_partition(first, mid, p); //jämn
-    std::vector<int>::iterator SR = stable_partition(mid, last, p); //ojämn
-    return std::rotate(SL, mid, SR);
+    std::vector<int>::iterator SL = stable_partition(first, mid, p); // see below T(1+n*log(n))
+    std::vector<int>::iterator SR = stable_partition(mid, last, p); //  see below
+    return std::rotate(SL, mid, SR); //T(n)
+
+    {
+        // T(n) = a, n = 1
+        // T(n) = f(n)+b*T(n/c), n>1
+        // 
+		// T(n) = 3, n = 1
+		// T(n) = 8+n+2*T(n/2), n>1
+        // f(n) = O(8+n) = O(n)
+		// a = 3, b = 2, c = 2, k = 1 gives with the master theorem O(n^k * log(n)) since b == c^k
+		// T(n) = O(n^k*log(n)) = O(n*log(n)) worst case
+        // 
+        // S(n) a = 0 , b = 1, c = 2
+        // S(n) = 0, n = 1
+        // S(n) = 4+S(n/2), n > 1
+        // f(n) = 4 = O(1) = O(n^k) => k = 0
+		// Master theorem gives: O(n^K * log(n)) since b > c^k which is 1 == 2^0
+        // S(n) = O(n^K * log(n)) = O(log(n))
+    }
+	
 }
