@@ -45,7 +45,7 @@ Set::Set(const std::vector<int>& list_of_values) : Set{} {  // create an empty l
     counter = std::ssize(list_of_values);
     for (int var : list_of_values) {
         Node* newLastNode = new Node(var, tail, tail->prev); // set newLastNode next and prev
-        tail->prev->next = newLastNode; // the previous last nodes next is set to newLastNode
+        (tail->prev)->next = newLastNode; // the previous last nodes next is set to newLastNode
         tail->prev = newLastNode; // the tails prev is set to newLastNode
     }
 }
@@ -58,10 +58,10 @@ Set::Set(const std::vector<int>& list_of_values) : Set{} {  // create an empty l
 Set::Set(const Set& S) : Set{} {  // create an empty list
     // IMPLEMENT before Lab2 HA
     counter = S.counter;
-    Node* stepPtr = S.head->next;
+    Node* stepPtr = S.head->next; 
     while (stepPtr != S.tail) {
         Node* newLastNode = new Node(stepPtr->value, tail, tail->prev); 
-        tail->prev->next = newLastNode; 
+        (tail->prev)->next = newLastNode; 
         tail->prev = newLastNode;
 
         stepPtr = stepPtr->next;
@@ -74,11 +74,21 @@ Set::Set(const Set& S) : Set{} {  // create an empty list
  */
 void Set::make_empty() {
     // IMPLEMENT before Lab2 HA
-    while (tail->next == tail) {
-        tail->prev = nullptr;
-        tail->next->value = NULL; // null / 0 eller vad ska det vara
-        tail = tail->next;
+    Node* mainStep = head->next;
+    head->next = tail;
+    tail->prev = head;
+    mainStep->prev = nullptr;
+
+    while (mainStep->next != tail) {
+        Node* backStep = mainStep;
+        mainStep = mainStep->next;
+
+        backStep->next = nullptr;
+        mainStep->prev = nullptr;
+        delete backStep;
     }
+    mainStep->next = nullptr;
+    delete mainStep;
 }
 
 /*
@@ -86,6 +96,12 @@ void Set::make_empty() {
  */
 Set::~Set() {
     // IMPLEMENT before Lab2 HA
+    this->make_empty();
+    /*head->next = nullptr;
+    tail->prev = nullptr;
+    delete head;
+    delete tail;*/
+    delete this;
 }
 
 /*
@@ -95,7 +111,8 @@ Set::~Set() {
  */
 Set& Set::operator=(Set S) {
     // IMPLEMENT before Lab2 HA
-    return *this;
+    Set newS(S);
+    return newS;
 }
 
 /*
@@ -105,7 +122,14 @@ Set& Set::operator=(Set S) {
  */
 bool Set::is_member(int val) const {
     // IMPLEMENT before Lab2 HA
-    return false;  // remove this line
+    Node* temp = head->next;
+    while (temp != tail) {
+        if (temp->value == val) {
+            return true;
+        }
+        temp = temp->next;
+    }
+    return false;  // remove this line  //???? no
 }
 
 /*
@@ -115,7 +139,17 @@ bool Set::is_member(int val) const {
  */
 bool Set::operator==(const Set& S) const {
     // IMPLEMENT before Lab2 HA
-    return false;  // remove this line
+    Node* temp1 = this->head;
+    Node* temp2 = S.head;
+    while (temp1->next != tail && temp2->next == S.tail) {
+        temp1 = temp1->next;
+        temp2 = temp2->next;
+        if (temp1->value != temp2->value) {
+            return false;
+        }
+    }
+
+    return true;  
 }
 
 /*
@@ -127,6 +161,10 @@ bool Set::operator==(const Set& S) const {
  */
 std::partial_ordering Set::operator<=>(const Set& S) const {
     // IMPLEMENT before Lab2 HA
+    if (*this == S) {
+        return std::partial_ordering::equivalent;
+    }
+
     return std::partial_ordering::unordered; // remove this line
 }
 
