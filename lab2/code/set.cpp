@@ -19,6 +19,10 @@ int Set::get_count_nodes() {
  */
 Set::Set() : counter{0} {
     // IMPLEMENT before Lab2 HA
+    head = new Node();
+    tail = new Node();
+    head->next = tail;
+    tail->prev = head;
 }
 
 /*
@@ -26,6 +30,10 @@ Set::Set() : counter{0} {
  */
 Set::Set(int val) : Set{} {  // create an empty list
     // IMPLEMENT before Lab2 HA
+    counter = 1;
+    Node* firstNode = new Node(val, tail, head); // the first constructor in node.h
+    head->next = firstNode;
+    tail->prev = firstNode;
 }
 
 /*
@@ -34,6 +42,12 @@ Set::Set(int val) : Set{} {  // create an empty list
  */
 Set::Set(const std::vector<int>& list_of_values) : Set{} {  // create an empty list
     // IMPLEMENT before Lab2 HA
+    counter = std::ssize(list_of_values);
+    for (int var : list_of_values) {
+        Node* newLastNode = new Node(var, tail, tail->prev); // set newLastNode next and prev
+        tail->prev->next = newLastNode; // the previous last nodes next is set to newLastNode
+        tail->prev = newLastNode; // the tails prev is set to newLastNode
+    }
 }
 
 /*
@@ -43,6 +57,15 @@ Set::Set(const std::vector<int>& list_of_values) : Set{} {  // create an empty l
  */
 Set::Set(const Set& S) : Set{} {  // create an empty list
     // IMPLEMENT before Lab2 HA
+    counter = S.counter;
+    Node* stepPtr = S.head->next;
+    while (stepPtr != S.tail) {
+        Node* newLastNode = new Node(stepPtr->value, tail, tail->prev); 
+        tail->prev->next = newLastNode; 
+        tail->prev = newLastNode;
+
+        stepPtr = stepPtr->next;
+    }
 }
 
 /*
@@ -51,6 +74,11 @@ Set::Set(const Set& S) : Set{} {  // create an empty list
  */
 void Set::make_empty() {
     // IMPLEMENT before Lab2 HA
+    while (tail->next == tail) {
+        tail->prev = nullptr;
+        tail->next->value = NULL; // null / 0 eller vad ska det vara
+        tail = tail->next;
+    }
 }
 
 /*
