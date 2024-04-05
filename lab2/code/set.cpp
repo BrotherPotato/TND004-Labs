@@ -174,6 +174,14 @@ std::partial_ordering Set::operator<=>(const Set& S) const {
  */
 Set& Set::operator+=(const Set& S) {
     // IMPLEMENT
+    Node* readhead1 = this->head->next;
+    Node* readhead2 = S.head->next;
+    while (readhead1 != tail && readhead2 != tail)
+    {
+        readhead1->value += readhead2->value;
+        readhead1 = readhead1->next;
+        readhead2 = readhead2->next;
+    }
     return *this;
 }
 
@@ -207,6 +215,11 @@ Set& Set::operator-=(const Set& S) {
  */
 void Set::insert_node(Node* p, int val) {
     // IMPLEMENT before Lab2 HA
+	Node* newNode = new Node(val, p->next, p);
+
+    newNode->prev = p;
+	newNode->next = p->next;
+	p->next = newNode;
 }
 
 /*
