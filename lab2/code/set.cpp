@@ -176,13 +176,13 @@ Set& Set::operator+=(const Set& S) {
     // IMPLEMENT
     Node* readhead1 = this->head->next;
     Node* readhead2 = S.head->next;
-    while (readhead1 != tail && readhead2 != tail)
+    while (readhead1 != this->tail && readhead2 != S.tail)
     {
         readhead1->value += readhead2->value;
         readhead1 = readhead1->next;
         readhead2 = readhead2->next;
     }
-    return *this;
+    return *this; 
 }
 
 /*
