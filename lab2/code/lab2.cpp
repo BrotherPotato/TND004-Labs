@@ -73,12 +73,11 @@ int main() {
 
         Set S1{A1};
         Set S2{S1};
-
         assert(Set::get_count_nodes() == 10);
 
         // Test
         std::ostringstream os{};
-        os << S1 << " " << S2;
+        os << S1 << " " << S2;  
 
         std::string tmp{os.str()};
         assert((tmp == std::string{"{ 1 3 5 } { 1 3 5 }"}));
@@ -100,10 +99,11 @@ int main() {
 
         std::vector<int> A2{2, 3, 4};
         Set S3{A2};
-
+        
         assert(Set::get_count_nodes() == 12);
 
         S1 = S2 = S3;
+        //std::cout << S1;
 
         assert(Set::get_count_nodes() == 15);
 
@@ -247,17 +247,23 @@ int main() {
         std::vector<int> A2{2, 3, 7};
 
         Set S1{A1};
+        
         Set S2{A2};
+        
         Set S3{};
-
+        
         S3 = S1 + S2;
         assert(Set::get_count_nodes() == 19);
-
+        
         // test
         std::vector<int> A3{1, 2, 3, 5, 7, 8};
         assert(S3 == Set{A3});
+        //std::cout << Set::get_count_nodes();
+        
 
         S3 = S1 * S2;
+        //std::cout << S3;
+        //std::cout << Set::get_count_nodes();
         assert(Set::get_count_nodes() == 14);
 
         // test
@@ -266,6 +272,7 @@ int main() {
 
         S3 = S1 - S2;
         // test
+        //std::cout << S1 << " " << S2<<" " << S3;
         std::vector<int> A5{1, 5, 8};
         assert(S3 == Set{A5});
     }
@@ -299,6 +306,7 @@ int main() {
         assert(S3 == Set(std::vector<int>{3, 4}));
 
         std::vector<int> A4{3, 4, 24};
+       // std::cout << (S2 - 2 + S3 + 24) << " == " << Set{A4};
         assert((S2 - 2 + S3 + 24) == Set{A4});
         assert(Set::get_count_nodes() == 14);
 
