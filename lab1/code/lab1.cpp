@@ -235,11 +235,15 @@ void TND004::stable_partition_iterative(std::vector<int>& V, std::function<bool(
     
     //copy(falseVector.begin(), falseVector.end(), std::back_inserter(trueVector));  //same thing as above  // T(2n) = O(n)
 	}
+
+    V = std::move(trueVector);
+	
     V.clear(); // O(n) T(n)
 	// std::back_inserter returns std::back_insert_iterator that uses Container::push_back().
 	// copy is of time complexity O(n), back_inserter T(1+1+n) = O(n)
     copy(trueVector.begin(), trueVector.end(), std::back_inserter(V));   // T(n+2+(1+1+n))) = T(4+2n) = O(n)
     copy(falseVector.begin(), falseVector.end(), std::back_inserter(V)); // T(n+2+(1+1+n))) = T(4+2n) = O(n)
+	
     //Whole function is O(n) T(1+1+n+n+(1+10n)+n+4+2n+4+2n) = T(11+17n) worst case
     //complexity: O(n) linear
 
