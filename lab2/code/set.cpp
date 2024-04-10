@@ -80,8 +80,6 @@ void Set::make_empty() {
 	// IMPLEMENT before Lab2 HA
 	Node* mainStep = head->next;
 
-	//mainStep->prev = nullptr;
-
 	while (mainStep->next != this->tail && mainStep != this->tail) {
 		Node* backStep = mainStep;
 		mainStep = mainStep->next;
@@ -161,19 +159,16 @@ std::partial_ordering Set::operator<=>(const Set& S) const {
 	Node* readhead2 = S.head->next;
 	bool thisSubOfS = false;
 	bool SSubOfThis = false;
-	//bool thisSameS = true;
 
 	while (readhead1 != this->tail && readhead2 != S.tail)
 	{
 		if (readhead1->value < readhead2->value) {
 			SSubOfThis = true;
-			//thisSameS = false;
 			readhead1 = readhead1->next;
 
 		}
 		else if (readhead1->value > readhead2->value) {
 			thisSubOfS = true;
-			//thisSameS = false;
 			readhead2 = readhead2->next;
 		}
 		else {
@@ -293,7 +288,6 @@ Set& Set::operator-=(const Set& S) {
 
 		}
 		else if (readhead1->value > readhead2->value) {
-			//insert_node(readhead1, readhead2->value);
 			readhead2 = readhead2->next;
 		}
 		else {
@@ -301,7 +295,6 @@ Set& Set::operator-=(const Set& S) {
 			readhead1 = readhead1->next;
 			readhead2 = readhead2->next;
 			remove_node(temp);
-			//readhead1 = readhead1->next;
 		}
 
 
