@@ -10,6 +10,8 @@ int Set::Node::count_nodes = 0;
  /*
   *  Default constructor :create an empty Set
   */
+// T(1) = O(1)
+// S(1) = O(1)
 int Set::get_count_nodes() {
 	return Set::Node::count_nodes;
 }
@@ -17,6 +19,8 @@ int Set::get_count_nodes() {
 /*
  *  Default constructor :create an empty Set
  */
+ // T(1) = O(1)
+ // S(1) = O(1)
 Set::Set() : counter{ 0 } {
 	// IMPLEMENT before Lab2 HA
 	head = new Node();
@@ -30,10 +34,7 @@ Set::Set() : counter{ 0 } {
  */
 Set::Set(int val) : Set{} {  // create an empty list
 	// IMPLEMENT before Lab2 HA
-	//Node* firstNode = new Node(val, tail, head); // the first constructor in node.h
 	insert_node(head, val);
-	/*   head->next = firstNode;
-	   tail->prev = firstNode;*/
 }
 
 /*
@@ -48,10 +49,6 @@ Set::Set(const std::vector<int>& list_of_values) : Set{} {  // create an empty l
 
 		insert_node(temp, var);
 		temp = temp->next;
-
-		//Node* newLastNode = new Node(var, tail, tail->prev); // set newLastNode next and prev
-		//(tail->prev)->next = newLastNode; // the previous last nodes next is set to newLastNode
-		//tail->prev = newLastNode; // the tails prev is set to newLastNode
 	}
 }
 
@@ -60,20 +57,17 @@ Set::Set(const std::vector<int>& list_of_values) : Set{} {  // create an empty l
  * \param S Set to copied
  * Function does not modify Set S in any way
  */
+// T(6+n) = T(n) = O(n) linear
+// S(2+n) = S(n) linear
 Set::Set(const Set& S) : Set{} {  // create an empty list
 	// IMPLEMENT before Lab2 HA
-	Node* stepPtr = S.head;
-	Node* temp = head;
-	while (stepPtr->next != S.tail) {
+	Node* stepPtr = S.head; // T(1) S(1)
+	Node* temp = head; // T(1) S(1)
+	while (stepPtr->next != S.tail) { // T(n+1) = O(n), S(n)
 
-
-		//Node* newLastNode = new Node(stepPtr->value, tail, tail->prev); 
-		//(tail->prev)->next = newLastNode; 
-		//tail->prev = newLastNode;
-		stepPtr = stepPtr->next;
-
-		insert_node(temp, stepPtr->value);
-		temp = temp->next;
+		stepPtr = stepPtr->next; //T(1)
+		insert_node(temp, stepPtr->value); //T(1) S(1) <- built into while
+		temp = temp->next; //T(1)
 
 	}
 }
@@ -92,14 +86,8 @@ void Set::make_empty() {
 		Node* backStep = mainStep;
 		mainStep = mainStep->next;
 
-		//backStep->next = nullptr;
-		//mainStep->prev = nullptr;
 		remove_node(backStep);
-		//delete backStep;
 	}
-
-	//mainStep->next = nullptr;
-	//delete mainStep;
 	if (mainStep != this->tail) remove_node(mainStep);
 
 
@@ -120,12 +108,15 @@ Set::~Set() {
  * \param S Set to be copied into Set *this
  * Call by valued is used
  */
-Set& Set::operator=(Set S) {
+// T(n2+3) = T(n2) = O(n2)
+// S(n2) = O(n2)
+Set& Set::operator=(Set S) { //copy constructor is called for S, which is T(n2) S(n2)
 	// IMPLEMENT before Lab2 HA
-	std::swap(counter, S.counter);
-	std::swap(head, S.head);
-	std::swap(tail, S.tail);
-	return *this;
+	// All swap will have combined S(1) will deallocate memory after running each swap 
+	std::swap(counter, S.counter); // T(1) S(1)
+	std::swap(head, S.head); // T(1) S(1)
+	std::swap(tail, S.tail); // T(1) S(1)
+	return *this; //not counting returns
 }
 
 /*
@@ -142,7 +133,7 @@ bool Set::is_member(int val) const {
 		}
 		temp = temp->next;
 	}
-	return false;  // remove this line  //???? no
+	return false;
 }
 
 /*
@@ -164,11 +155,6 @@ bool Set::operator==(const Set& S) const {
  */
 std::partial_ordering Set::operator<=>(const Set& S) const {
 	// IMPLEMENT before Lab2 HA
-	//if (*this == S) {
-	//    return std::partial_ordering::equivalent;
-	//}
-
-	//return std::partial_ordering::unordered; // remove this line
 
 
 	Node* readhead1 = this->head->next;
@@ -224,49 +210,53 @@ std::partial_ordering Set::operator<=>(const Set& S) const {
  * Modify Set *this such that it becomes the union of *this with Set S
  * Set *this is modified and then returned
  */
+//n1 - length of *this, n2 - length of S
+//T(n2,n1) = O(n1,n2) will loop though the entire n2 but not always n1.
+// S(n2) = O(n2) if there is something in s2 we will insert otherwise there will be no difference in the space.
 Set& Set::operator+=(const Set& S) {
 	// IMPLEMENT
-	Node* readhead1 = this->head->next;
-	Node* readhead2 = S.head->next;
-	while (readhead1 != this->tail && readhead2 != S.tail)
-	{
-		if (readhead1->value < readhead2->value) {
-			readhead1 = readhead1->next;
+	Node* readhead1 = this->head->next; // S(1) T(1)
+	Node* readhead2 = S.head->next; // S(1) T(1)
+	while (readhead1 != this->tail && readhead2 != S.tail){ // T(min(n1, n2)+3) = O(n1, n2), S(min(n1,n2)) = S(n2) = O(n2) because insert_node
+		if (readhead1->value < readhead2->value) { // T(3)
+			readhead1 = readhead1->next; 
 
 		}
-		else if (readhead1->value > readhead2->value) {
-			insert_node(readhead1->prev, readhead2->value);
-			readhead2 = readhead2->next;
+		else if (readhead1->value > readhead2->value) { // T(3)
+			insert_node(readhead1->prev, readhead2->value); //T(1) S(1)
+			readhead2 = readhead2->next; // T(1)
 		}
 		else {
-			readhead2 = readhead2->next;
-			readhead1 = readhead1->next;
+			readhead2 = readhead2->next; //T(1)
+			readhead1 = readhead1->next; //T(1)
 		}
 
 
 	} // while
 
-	while (readhead2 != S.tail) {
-		insert_node(readhead1->prev, readhead2->value);
-		readhead2 = readhead2->next;
+	while (readhead2 != S.tail) { //T(n2) S(n2 - min(n1,n2))
+		insert_node(readhead1->prev, readhead2->value); // T(1) S(1)
+		readhead2 = readhead2->next; //T(1)
 	}
 	return *this;
-} // O(2n) = O(n)
+} 
 
 /*
  * Modify Set *this such that it becomes the intersection of *this with Set S
  * Set *this is modified and then returned
  */
+// T(n1,n2) = O(n1,n2) linear func of n1 and n2
+// S(3) = S(1) = O(1) linear
 Set& Set::operator*=(const Set& S) {
 	// IMPLEMENT
-	Node* readhead1 = this->head->next;
-	Node* readhead2 = S.head->next;
-	while (readhead1 != this->tail && readhead2 != S.tail)
+	Node* readhead1 = this->head->next; //T(1) S(1)
+	Node* readhead2 = S.head->next; //T(1) S(1)
+	while (readhead1 != this->tail && readhead2 != S.tail) //T(min(n1, n2)) S(1)
 	{
 		if (readhead1->value < readhead2->value) {
-			Node* temp = readhead1;
+			Node* temp = readhead1; // T(1) S(1)
 			readhead1 = readhead1->next;
-			remove_node(temp);
+			remove_node(temp); //T(1)
 		}
 		else if (readhead1->value > readhead2->value) {
 
@@ -277,25 +267,13 @@ Set& Set::operator*=(const Set& S) {
 			readhead1 = readhead1->next;
 		}
 
-
 	}
-	//if (readhead2 != S.tail) {
-	//	while (readhead1 != this->tail)
-	//	{
-	//		Node* temp = readhead1;
-	//		readhead1 = readhead1->next;
-	//		remove_node(temp);
-	//	}
-	//}
-	if (readhead1 != this->tail) {
-		while (readhead1 != this->tail)
+		while (readhead1 != this->tail) // T(n1 - min(n1, n2)) S(1)
 		{
-			Node* temp = readhead1;
+			Node* temp = readhead1; // S(1) T(1)
 			readhead1 = readhead1->next;
-			remove_node(temp);
+			remove_node(temp); // T(1)
 		}
-	}
-
 
 	return *this;
 }
@@ -327,12 +305,7 @@ Set& Set::operator-=(const Set& S) {
 		}
 
 
-	}
-	//if (readhead1 == this->tail) {
-	//	while (readhead2 != S.tail) {
-	//		insert_node(readhead1, readhead2->value);
-	//	}
-	//}
+	} // while
 	return *this;
 }
 
@@ -346,29 +319,27 @@ Set& Set::operator-=(const Set& S) {
   * \param p pointer to a Node
   * \param val value to be inserted  after position p
   */
+  // T(1) = O(1)
+  // S(1) = O(1)
 void Set::insert_node(Node* p, int val) {
 	// IMPLEMENT before Lab2 HA
 	Node* newNode = new Node(val, p->next, p);
 
-	//newNode->prev = p;
-	//newNode->next = p->next;
 	p->next->prev = newNode;
 	p->next = newNode;
-	
 	counter++;
-	//p->prev = p->prev->next = newNode; 
 }
 
 /*
  * Remove the Node pointed by p
  * \param p pointer to a Node
  */
-void Set::remove_node(Node* p) {
+void Set::remove_node(Node* p) { //T(1) = O(1) 
 	// IMPLEMENT before Lab2 HA
 	counter--;
 	p->prev->next = p->next;
 	p->next->prev = p->prev;
-	delete p;
+	delete p; //T(1)
 }
 
 /*
