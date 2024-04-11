@@ -34,7 +34,7 @@ Set::Set() : counter{ 0 } {
  */
 Set::Set(int val) : Set{} {  // create an empty list
 	// IMPLEMENT before Lab2 HA
-	insert_node(head, val);
+	insert_node(head, val); //T(1) S(1)
 }
 
 /*
@@ -206,7 +206,7 @@ std::partial_ordering Set::operator<=>(const Set& S) const {
  * Set *this is modified and then returned
  */
 //n1 - length of *this, n2 - length of S
-//T(n2,n1) = O(n1,n2) will loop though the entire n2 but not always n1.
+//T(n2,n1) = O(n1+n2) will loop though the entire n2 but not always n1.
 // S(n2) = O(n2) if there is something in s2 we will insert otherwise there will be no difference in the space.
 Set& Set::operator+=(const Set& S) {
 	// IMPLEMENT
@@ -240,8 +240,8 @@ Set& Set::operator+=(const Set& S) {
  * Modify Set *this such that it becomes the intersection of *this with Set S
  * Set *this is modified and then returned
  */
-// T(n1,n2) = O(n1,n2) linear func of n1 and n2
-// S(3) = S(1) = O(1) linear
+// T(n1,n2) = O(n1+n2) linear func of n1 and n2
+// S(3) = S(1) = O(1) const
 Set& Set::operator*=(const Set& S) {
 	// IMPLEMENT
 	Node* readhead1 = this->head->next; //T(1) S(1)
