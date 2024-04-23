@@ -106,7 +106,7 @@ Set::~Set() {
  * \param S Set to be copied into Set *this
  * Call by valued is used
  */
-// T(n2+3) = T(n2) = O(n2)
+// T(n1+n2+3) = T(n1+n2) = O(n1+n2)
 // S(n2) = O(n2)
 Set& Set::operator=(Set S) { //copy constructor is called for S, which is T(n2) S(n2)
 	// IMPLEMENT before Lab2 HA
@@ -114,7 +114,7 @@ Set& Set::operator=(Set S) { //copy constructor is called for S, which is T(n2) 
 	std::swap(counter, S.counter); // T(1) S(1)
 	std::swap(head, S.head); // T(1) S(1)
 	std::swap(tail, S.tail); // T(1) S(1)
-	return *this; //not counting returns
+	return *this; //not counting returns // calls the destructor of S (which now has elements n1)
 }
 
 /*
