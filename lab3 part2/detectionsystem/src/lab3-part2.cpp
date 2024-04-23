@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <filesystem>
+#include <fstream>
 
 #include <rendering/window.h>
 #include <fmt/format.h>
@@ -11,10 +12,53 @@ void plotData(const std::string& name);
 
 /* ************************************* */
 
+struct Line {
+    Point start;
+    Point end;
+
+    double slope = 0.0;
+};
+
+struct Point {
+    double x = 0.0;
+    double y = 0.0;
+};
+
+class Lines {
+public:
+    Lines();
+    ~Lines() = default;
+
+    void calcSlope(Line);
+
+private:
+    std::vector<Line> lineVec;
+};
+
+Lines::Lines() {}
+
+Lines::~Lines() {}
+
+void Lines::calcSlope(Line) {}
+
+std::vector<Point> fileReader(const std::string& filename) {
+    std::filesystem::path points_name = filename;
+
+    std::ifstream pointsFile(filename);
+
+    if (!pointsFile) {
+        std::cout << "Points file error!!\n";
+        return {};
+    }
+
+}
+
 int main() try {
     std::cout << "Enter the name of input points file: ";
     std::string s;
     std::cin >> s;  // e.g. points1.txt, points200.txt, largeMystery.txt
+
+    fileReader(s);
 
     plotData(s);
 } catch (const std::exception& e) {

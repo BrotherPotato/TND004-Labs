@@ -109,7 +109,7 @@ void runSimulation() {
     system.abortCallback = [&]() { return window.shouldClose(); };
 
     fmt::print("Simulations starts ...\n");
-    system.simulate(10000, 10);  // simulate
+    system.simulate(10000, 10);  // simulate//10
 }
 
 /**
