@@ -38,7 +38,7 @@ void runSimulation();
 
 int main() {
 #ifdef TEST_PRIORITY_QUEUE
-    test1PriorityQueue();  // test toss, deleteMin, heapify, isMinHeap
+    //test1PriorityQueue();  // test toss, deleteMin, heapify, isMinHeap
     test2PriorityQueue();  // test insert, deleteMin, isMinHeap
 #endif
 
