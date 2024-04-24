@@ -12,17 +12,19 @@ void plotData(const std::string& name);
 
 /* ************************************* */
 
-struct Line {
-    Point start;
-    Point end;
-
-    double slope = 0.0;
-};
-
 struct Point {
     double x = 0.0;
     double y = 0.0;
 };
+
+struct Line {
+    Point start = Point{};
+    Point end = Point{};
+
+    double slope = 0.0;
+};
+
+
 
 class Lines {
 public:
@@ -37,18 +39,29 @@ private:
 
 Lines::Lines() {}
 
-Lines::~Lines() {}
-
 void Lines::calcSlope(Line) {}
 
 std::vector<Point> fileReader(const std::string& filename) {
     std::filesystem::path points_name = filename;
-
-    std::ifstream pointsFile(filename);
+    std::cout << points_name << '\n';
+    std::ifstream pointsFile(points_name);
 
     if (!pointsFile) {
         std::cout << "Points file error!!\n";
         return {};
+    }
+
+    int n_points{0};
+    pointsFile >> n_points;  // read number of particles
+
+    std::vector<Point> points;
+    points.reserve(n_points);
+    for (int i = 0; i < n_points; ++i) {
+        Point temp = Point{};
+        auto& p = points.emplace_back(temp);
+        pointsFile >> p.x >> p.y;
+        p.x /= 32767.0;
+        p.y /= 32767.0;
     }
 
 }
@@ -58,7 +71,9 @@ int main() try {
     std::string s;
     std::cin >> s;  // e.g. points1.txt, points200.txt, largeMystery.txt
 
-    fileReader(s);
+    std::vector<Point> allPoints = fileReader(s);
+
+    std::cout << "A";
 
     plotData(s);
 } catch (const std::exception& e) {
