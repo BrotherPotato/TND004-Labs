@@ -31,7 +31,7 @@ public:
     Lines();
     ~Lines() = default;
 
-    void calcSlope(Line);
+    void calcSlope(Line&);
 
 private:
     std::vector<Line> lineVec;
@@ -39,7 +39,7 @@ private:
 
 Lines::Lines() {}
 
-void Lines::calcSlope(Line) {}
+void Lines::calcSlope(Line& L) { L.slope = (L.end.y - L.start.y) / (L.end.x - L.start.x); } //vill vi att den beräknar för en eller för alla och ska den returnera något eller vill vi ta byrefrence
 
 std::vector<Point> fileReader(const std::string& filename) {
     std::filesystem::path points_name = filename;
