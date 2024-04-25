@@ -31,8 +31,10 @@ struct CompleteLine {
 };
 
 //std::vector<std::vector<Point>>
-
-class Lines {
+// 
+//  jag hatar denna klass så mycket. Like varför är det en class som bara hanterar slope och vector
+//  av linesegment vi kommer bara behöva 1 vector och beräkna slope kan vara en funktion.
+class Lines { 
 public:
     Lines();
     ~Lines() = default;
@@ -106,6 +108,9 @@ int main() try {
     std::vector<LineSegment> allLines; 
 
     std::vector<CompleteLine> allCompleteLines;
+
+	//Lines lines; // like det här är så jävla pantat :((((
+    //lines.calcSlope(allLines[0]);
 
     writeFile(allCompleteLines, s);
 
