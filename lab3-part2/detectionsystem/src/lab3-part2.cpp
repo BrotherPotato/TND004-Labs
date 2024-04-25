@@ -96,6 +96,19 @@ void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
     out_file.close();
 }
 
+double calcSlope(Point start, Point end) { return (end.y - start.y) / (end.x - start.x); }
+
+void cookLineSegments(std::vector<Point>& PV, std::vector<LineSegment>& LV) {
+    for (int i = 0; i < std::ssize(PV); i++) {
+        for (int j = 0; j < std::ssize(PV); j++) {
+            LineSegment temp = LineSegment{PV[i], PV[j], calcSlope(PV[i], PV[j])};
+            if (temp.slope != 0.0) {
+                LV.push_back(temp);
+            }
+        }
+    }
+}
+
 int main() try {
     std::cout << "Enter the name of input points file: ";
     std::string s;
@@ -104,8 +117,10 @@ int main() try {
     std::vector<Point> allPoints = fileReader(s);
 
     std::cout << "A";
-
+	
     std::vector<LineSegment> allLines; 
+
+	cookLineSegments(allPoints, allLines);
 
     std::vector<CompleteLine> allCompleteLines;
 
