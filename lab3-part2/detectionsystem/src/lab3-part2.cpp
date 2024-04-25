@@ -119,7 +119,7 @@ void cookLineSegments(std::vector<Point>& PV, std::vector<LineSegment>& LV) {
         for (int j = 0; j < std::ssize(PV); j++) {
             LineSegment temp = LineSegment{PV[i], PV[j], calcSlope(PV[i], PV[j])}; //lyckas inte beräkna slope :/
             if (temp.slope != 0.0) {
-                LV.push_back(temp);
+                LV.push_back(temp); //n om vi inte reservar
             }
         }
     }
@@ -140,24 +140,27 @@ int main() try {
 
     std::cout << "A";
 	
-    std::vector<LineSegment> allLines; 
+    std::vector<LineSegment> allLines;
 
-	cookLineSegments(allPoints, allLines);
+	cookLineSegments(allPoints, allLines);  // n^2, n^3 om vi inte använder reserve
 
-    std::stable_sort(allLines.begin(), allLines.end());
+    std::stable_sort(allLines.begin(), allLines.end()); //nlogn
     
     for (size_t i = 0; i < allLines.size()-1; i++) {
         std::cout << allLines[i].slope << '\n';
     }
 
- //   std::vector<CompleteLine> allCompleteLines;
+    //TODO: ta bort alla kopior
+    //TODO: slå ihop linjer
 
-	////Lines lines; // like det här är så jävla pantat :((((
- //   //lines.calcSlope(allLines[0]);
+    std::vector<CompleteLine> allCompleteLines;
 
- //   writeFile(allCompleteLines, s);
+	//Lines lines; // like det här är så jävla pantat :((((
+    //lines.calcSlope(allLines[0]);
 
- //   plotData(s);
+    writeFile(allCompleteLines, s);
+
+    plotData(s);
 } catch (const std::exception& e) {
     fmt::print("Error: {}", e.what());
     return 1;
