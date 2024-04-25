@@ -74,6 +74,7 @@ std::vector<Point> fileReader(const std::string& filename) {
         p.x /= 32767.0;
         p.y /= 32767.0;
     }
+    return points;
 }
 
 void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
@@ -96,12 +97,12 @@ void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
     out_file.close();
 }
 
-double calcSlope(Point start, Point end) { return (end.y - start.y) / (end.x - start.x); }
+double calcSlope(Point& start, Point& end) { return (end.y - start.y) / (end.x - start.x); }
 
 void cookLineSegments(std::vector<Point>& PV, std::vector<LineSegment>& LV) {
     for (int i = 0; i < std::ssize(PV); i++) {
         for (int j = 0; j < std::ssize(PV); j++) {
-            LineSegment temp = LineSegment{PV[i], PV[j], calcSlope(PV[i], PV[j])};
+            LineSegment temp = LineSegment{PV[i], PV[j], calcSlope(PV[i], PV[j])}; //lyckas inte beräkna slope :/
             if (temp.slope != 0.0) {
                 LV.push_back(temp);
             }
@@ -129,15 +130,19 @@ int main() try {
 	cookLineSegments(allPoints, allLines);
 
     std::stable_sort(allLines.begin(), allLines.end());
+    
+    for (size_t i = 0; i < allLines.size()-1; i++) {
+        std::cout << allLines[i].slope << '\n';
+    }
 
-    std::vector<CompleteLine> allCompleteLines;
+ //   std::vector<CompleteLine> allCompleteLines;
 
-	//Lines lines; // like det här är så jävla pantat :((((
-    //lines.calcSlope(allLines[0]);
+	////Lines lines; // like det här är så jävla pantat :((((
+ //   //lines.calcSlope(allLines[0]);
 
-    writeFile(allCompleteLines, s);
+ //   writeFile(allCompleteLines, s);
 
-    plotData(s);
+ //   plotData(s);
 } catch (const std::exception& e) {
     fmt::print("Error: {}", e.what());
     return 1;
