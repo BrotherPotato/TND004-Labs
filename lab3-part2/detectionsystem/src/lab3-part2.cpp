@@ -97,7 +97,22 @@ void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
     out_file.close();
 }
 
-double calcSlope(Point& start, Point& end) { return (end.y - start.y) / (end.x - start.x); }
+double calcSlope(Point& start, Point& end) { 
+    //double temp = (end.y - start.y) / (end.x - start.x);
+    double num = end.y - start.y;
+    double den = end.x - start.x;
+    
+    if (num == 0.0) {
+        return 0.0;
+    } else if (den == 0.0) {
+        return 1.0;
+    }
+    
+    //double delta = 1e-10;
+
+    return num / den;
+    
+}
 
 void cookLineSegments(std::vector<Point>& PV, std::vector<LineSegment>& LV) {
     for (int i = 0; i < std::ssize(PV); i++) {
