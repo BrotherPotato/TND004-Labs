@@ -109,6 +109,12 @@ void cookLineSegments(std::vector<Point>& PV, std::vector<LineSegment>& LV) {
     }
 }
 
+bool operator<(const LineSegment& LeftLineSeg, const LineSegment& RightLineSeg) {// used in stablesort
+    return LeftLineSeg.slope < RightLineSeg.slope; 
+}
+
+
+
 int main() try {
     std::cout << "Enter the name of input points file: ";
     std::string s;
@@ -121,6 +127,8 @@ int main() try {
     std::vector<LineSegment> allLines; 
 
 	cookLineSegments(allPoints, allLines);
+
+    std::stable_sort(allLines.begin(), allLines.end());
 
     std::vector<CompleteLine> allCompleteLines;
 
