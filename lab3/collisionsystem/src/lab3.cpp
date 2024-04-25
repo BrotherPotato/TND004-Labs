@@ -85,9 +85,9 @@ void runSimulation() {
     std::string name;
     std::cin >> name;
 
-    // std::string path_to{"../collisionsystem/data/"}; // modify this path, if needed (Mac)
-    // std::filesystem::path particlesFile = path_to + name;
-    std::filesystem::path particlesFile = name;
+     std::string path_to{"../collisionsystem/data/"}; // modify this path, if needed (Mac)
+     std::filesystem::path particlesFile = path_to + name;
+    //std::filesystem::path particlesFile = name;
     auto theParticles = read_particles(particlesFile);
 
     if (std::size(theParticles) == 0) {

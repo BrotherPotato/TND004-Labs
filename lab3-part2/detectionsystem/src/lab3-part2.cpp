@@ -36,8 +36,8 @@ struct CompleteLine {
 //  av linesegment vi kommer bara behöva 1 vector och beräkna slope kan vara en funktion.
 class Lines { 
 public:
-    Lines();
-    ~Lines() = default;
+    Lines(); //constructor
+    ~Lines() = default; //destructor
 
     void calcSlope(LineSegment&);
 

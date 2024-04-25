@@ -16,8 +16,8 @@ namespace {
 void addEvent(double time, Particle* particleA, Particle* particleB, PriorityQueue<Event>& queue,
               double simulationTime) {
     if (time < simulationTime) {
-        // queue.insert(Event{time, particleA, particleB});
-        queue.toss(Event{time, particleA, particleB});
+        queue.insert(Event{time, particleA, particleB});
+        //queue.toss(Event{time, particleA, particleB});
     }
 }
 
@@ -95,7 +95,7 @@ void CollisionSystem::simulate(double simulationTime, double drawFrequenzy) {
             // add another redraw event to the queue
             addEvent(currentTime + 1.0 / drawFrequenzy, nullptr, nullptr, queue, simulationTime);
 
-            fmt::print("Simulation Time: {:8.3f}, Queue Size: {:10}\n", currentTime, queue.size());
+            //fmt::print("Simulation Time: {:8.3f}, Queue Size: {:10}\n", currentTime, queue.size());
 
             if (abortCallback()) break; // in case user closes the simulation window
         }
