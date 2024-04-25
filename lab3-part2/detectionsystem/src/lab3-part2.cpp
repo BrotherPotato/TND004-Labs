@@ -141,6 +141,7 @@ int main() try {
     std::cout << "A";
 	
     std::vector<LineSegment> allLines;
+    allLines.reserve(allPoints.size() * allPoints.size()); //lol
 
 	cookLineSegments(allPoints, allLines);  // n^2, n^3 om vi inte använder reserve
 
