@@ -30,12 +30,13 @@ struct CompleteLine {
     // Point end = Point{0, 0};
     std::vector<Point> intermediaryPoints = {};
     double slope = 0.0;
+    // double m = 0.0;
 };
 
 // std::vector<std::vector<Point>>
 //
-//   jag hatar denna klass så mycket. Like varför är det en class som bara hanterar slope och vector
-//   av linesegment vi kommer bara behöva 1 vector och beräkna slope kan vara en funktion.
+//   jag hatar denna klass sï¿½ mycket. Like varfï¿½r ï¿½r det en class som bara hanterar slope och vector
+//   av linesegment vi kommer bara behï¿½va 1 vector och berï¿½kna slope kan vara en funktion.
 class Lines {
 public:
     Lines();             // constructor
@@ -51,7 +52,7 @@ Lines::Lines() {}
 
 void Lines::calcSlope(LineSegment& L) {
     L.slope = (L.end.y - L.start.y) / (L.end.x - L.start.x);
-}  // vill vi att den beräknar för en eller för alla och ska den returnera något eller vill vi ta
+}  // vill vi att den berï¿½knar fï¿½r en eller fï¿½r alla och ska den returnera nï¿½got eller vill vi ta
    // byrefrence
 
 std::vector<Point> fileReader(const std::string& filename) {
@@ -150,7 +151,7 @@ void findCollinearPoints(std::vector<LineSegment>& LV, std::vector<CompleteLine>
             if (LV[i].slope != LV[j].slope) {
                 break;
             }
-            if (LV[i].m == LV[j].m || (LV[i].slope == -1 && LV[j].slope == -1)) {
+            if (LV[i].m == LV[j].m || (LV[i].slope == -1 && LV[i].start.x == LV[j].start.x)) {
                 tempLine.intermediaryPoints.push_back(LV[j].start);
                 tempLine.intermediaryPoints.push_back(LV[j].end);
 
@@ -170,15 +171,15 @@ void removeDuplicates(std::vector<CompleteLine>& CLV) {
     for (size_t i = 0; i < std::ssize(CLV); i++) {
         // std::unique(CLV[i].intermediaryPoints.begin(), CLV[i].intermediaryPoints.end(),
         //             [&](Point& A, Point& B) { return A.x == B.y && A.y == B.y; });
-        CLV[i].intermediaryPoints.erase(
+        /*CLV[i].intermediaryPoints.erase(
             std::unique(CLV[i].intermediaryPoints.begin(), CLV[i].intermediaryPoints.end(),
-                        [&](Point& A, Point& B) { return A.x == B.y && A.y == B.y; }));
+                        [&](Point& A, Point& B) { return A.x == B.y && A.y == B.y; }));*/
 
         // for (size_t j = 0; j < CLV[i].intermediaryPoints.size(); j++) {
 
         //}
 
-        std::cout << "this bitch empty";
+        // std::cout << "this bitch empty";
     }
 }
 
@@ -194,12 +195,12 @@ int main() try {
     std::vector<LineSegment> allLines;
     allLines.reserve(allPoints.size() * allPoints.size());  // lol
 
-    cookLineSegments(allPoints, allLines);  // n^2, n^3 om vi inte använder reserve
+    cookLineSegments(allPoints, allLines);  // n^2, n^3 om vi inte anvï¿½nder reserve
 
     std::sort(allLines.begin(), allLines.end());  // nlogn
 
     // TODO: ta bort alla kopior
-    // TODO: slå ihop linjer
+    // TODO: slï¿½ ihop linjer
 
     std::vector<CompleteLine> allCompleteLines;
 
