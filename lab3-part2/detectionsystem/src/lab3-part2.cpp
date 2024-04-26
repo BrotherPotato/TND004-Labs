@@ -30,6 +30,7 @@ struct CompleteLine {
     // Point end = Point{0, 0};
     std::vector<Point> intermediaryPoints = {};
     double slope = 0.0;
+    //double m = 0.0;
 };
 
 // std::vector<std::vector<Point>>
@@ -129,9 +130,10 @@ void cookLineSegments(std::vector<Point>& PV, std::vector<LineSegment>& LV) {
             LineSegment temp = LineSegment{PV[i], PV[j], calcSlope(PV[i], PV[j])};
             temp.m = temp.start.y - temp.slope * temp.start.x;  // m = y - kx
             // temp.length = calcLength(temp);
-            if (temp.slope == -1) {
+            /*if (temp.slope < 0) {
+                
+            }*/
             LV.push_back(temp);  // n om vi inte reservar
-            }
         }
     }
 }
@@ -149,7 +151,7 @@ void findCollinearPoints(std::vector<LineSegment>& LV, std::vector<CompleteLine>
             if (LV[i].slope != LV[j].slope) {
                 break;
             }
-            if (LV[i].m == LV[j].m || (LV[i].slope == -1 && LV[j].slope == -1)) {
+            if (LV[i].m == LV[j].m || (LV[i].slope == -1 && LV[i].start.x == LV[j].start.x)) {
                 tempLine.intermediaryPoints.push_back(LV[j].start);
                 tempLine.intermediaryPoints.push_back(LV[j].end);
 
@@ -169,15 +171,15 @@ void removeDuplicates(std::vector<CompleteLine>& CLV) {
     for (size_t i = 0; i < std::ssize(CLV); i++) {
         //std::unique(CLV[i].intermediaryPoints.begin(), CLV[i].intermediaryPoints.end(),
         //            [&](Point& A, Point& B) { return A.x == B.y && A.y == B.y; });
-        CLV[i].intermediaryPoints.erase(
+        /*CLV[i].intermediaryPoints.erase(
             std::unique(CLV[i].intermediaryPoints.begin(), CLV[i].intermediaryPoints.end(),
-                        [&](Point& A, Point& B) { return A.x == B.y && A.y == B.y; }));
+                        [&](Point& A, Point& B) { return A.x == B.y && A.y == B.y; }));*/
         
         //for (size_t j = 0; j < CLV[i].intermediaryPoints.size(); j++) {
 
         //}
 
-    std::cout << "this bitch empty";
+        //std::cout << "this bitch empty";
 
     }
 }
