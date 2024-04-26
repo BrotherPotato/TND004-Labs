@@ -61,6 +61,7 @@ std::vector<Point> fileReader(const std::string& filename) {
 
     if (!pointsFile) {
         std::cout << "Points file error!!\n";
+        assert(pointsFile);
         return {};
     }
 
@@ -124,14 +125,14 @@ double calcLength(LineSegment& L) {
 // naive implementation of linesegment
 void cookLineSegments(std::vector<Point>& PV, std::vector<LineSegment>& LV) {
     for (int i = 0; i < std::ssize(PV); i++) {
-        for (int j = 0; j < std::ssize(PV); j++) {
-            if (i == j) continue;
-            LineSegment temp = LineSegment{PV[i], PV[j], calcSlope(PV[i], PV[j])};
-            temp.m = temp.start.y - temp.slope * temp.start.x;  // m = y - kx
-            // temp.length = calcLength(temp);
-            if (temp.slope == -1) {
+        for (int j = i + 1; j < std::ssize(PV); j++) {
+
+            LineSegment temp = LineSegment{PV[i], PV[j], calcSlope(PV[i], PV[j])};  //
+
+            // temp.m = temp.start.y - temp.slope * temp.start.x;  // m = y - kx
+            //  temp.length = calcLength(temp);
+
             LV.push_back(temp);  // n om vi inte reservar
-            }
         }
     }
 }
@@ -154,7 +155,7 @@ void findCollinearPoints(std::vector<LineSegment>& LV, std::vector<CompleteLine>
                 tempLine.intermediaryPoints.push_back(LV[j].end);
 
             } else {
-                // kys
+                // do nothing
             }
         }
         i += tempLine.intermediaryPoints.size() / 2;
@@ -165,20 +166,19 @@ void findCollinearPoints(std::vector<LineSegment>& LV, std::vector<CompleteLine>
 }
 
 void removeDuplicates(std::vector<CompleteLine>& CLV) {
-    
+
     for (size_t i = 0; i < std::ssize(CLV); i++) {
-        //std::unique(CLV[i].intermediaryPoints.begin(), CLV[i].intermediaryPoints.end(),
-        //            [&](Point& A, Point& B) { return A.x == B.y && A.y == B.y; });
+        // std::unique(CLV[i].intermediaryPoints.begin(), CLV[i].intermediaryPoints.end(),
+        //             [&](Point& A, Point& B) { return A.x == B.y && A.y == B.y; });
         CLV[i].intermediaryPoints.erase(
             std::unique(CLV[i].intermediaryPoints.begin(), CLV[i].intermediaryPoints.end(),
                         [&](Point& A, Point& B) { return A.x == B.y && A.y == B.y; }));
-        
-        //for (size_t j = 0; j < CLV[i].intermediaryPoints.size(); j++) {
+
+        // for (size_t j = 0; j < CLV[i].intermediaryPoints.size(); j++) {
 
         //}
 
-    std::cout << "this bitch empty";
-
+        std::cout << "this bitch empty";
     }
 }
 
@@ -196,7 +196,7 @@ int main() try {
 
     cookLineSegments(allPoints, allLines);  // n^2, n^3 om vi inte använder reserve
 
-    std::stable_sort(allLines.begin(), allLines.end());  // nlogn
+    std::sort(allLines.begin(), allLines.end());  // nlogn
 
     // TODO: ta bort alla kopior
     // TODO: slå ihop linjer
@@ -207,7 +207,6 @@ int main() try {
 
     std::cout << "SUMSUM: " << allCompleteLines.size();
 
-
     removeDuplicates(allCompleteLines);
 
     for (size_t i = 0; i < allCompleteLines.size() - 1; i++) {
@@ -217,7 +216,6 @@ int main() try {
             std::cout << allCompleteLines[i].intermediaryPoints[j].y << ") \n";
         }
     }
-
 
     writeFile(allCompleteLines, s);
 
