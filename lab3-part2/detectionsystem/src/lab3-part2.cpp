@@ -7,6 +7,7 @@
 
 #include <rendering/window.h>
 #include <fmt/format.h>
+#include <limits>
 
 void plotData(const std::string& name);
 
@@ -109,7 +110,7 @@ double calcSlope(Point& start, Point& end) {
     if (num == 0.0) {
         return 0.0;
     } else if (den == 0.0) {
-        return -1.0;  // reading from left to right top to bottom
+        return std::numeric_limits<double>::infinity();
     }
 
     // double delta = 1e-10;
@@ -124,16 +125,20 @@ double calcLength(LineSegment& L) {
 }
 
 // naive implementation of linesegment
-void cookLineSegments(std::vector<Point>& PV, std::vector<LineSegment>& LV) {
+void cookLineSegments(std::vector<Point>& PV, std::vector<std::pair<double, Point>>& VP) {
     for (int i = 0; i < std::ssize(PV); i++) {
         for (int j = i + 1; j < std::ssize(PV); j++) {
 
-            LineSegment temp = LineSegment{PV[i], PV[j], calcSlope(PV[i], PV[j])};  //
+            //LineSegment temp = LineSegment{PV[i], PV[j], calcSlope(PV[i], PV[j])};  
+
+            std::pair<double, Point> tempp;
+            tempp.first = calcSlope(PV[i], PV[j]);
+            tempp.second = PV[j];
 
             // temp.m = temp.start.y - temp.slope * temp.start.x;  // m = y - kx
             //  temp.length = calcLength(temp);
 
-            LV.push_back(temp);  // n om vi inte reservar
+            VP.push_back(tempp);  // n om vi inte reservar
         }
     }
 }
