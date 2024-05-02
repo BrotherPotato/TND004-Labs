@@ -141,13 +141,12 @@ bool operator<(const LineSegment& LeftLineSeg,
 }
 
 void findCollinearPoints(
-    std::vector<std::vector<LineSegment>>&
-        allLines /*std::vector<LineSegment>& LV*/ /*, std::vector<CompleteLine>& CLV*/) {
-    for (size_t i = 0; i < std::ssize(allLines);) {
+    std::vector<LineSegment>& linesFromP /*std::vector<LineSegment>& LV*/ /*, std::vector<CompleteLine>& CLV*/) {
+    for (size_t i = 0; i < std::ssize(linesFromP);) {
         CompleteLine tempLine;
-        tempLine.intermediaryPoints.push_back(allLines[i][0].VP.second);
+        tempLine.intermediaryPoints.push_back(linesFromP[i].VP.second);
 
-        for (size_t j = i; j < std::ssize(allLines[i]); j++) {
+        for (size_t j = i; j < std::ssize(linesFromP); j++) {
             //if (LV[i].VP.first != LV[j].VP.first) {
             //    break;
             //}
@@ -159,8 +158,8 @@ void findCollinearPoints(
             //    // do nothing
             //}
 
-            if (abs(allLines[i][j].VP.first - allLines[i][j+1].VP.first) < 0.0001) {
-                tempLine.intermediaryPoints.push_back(allLines[i][j + 1].VP.second);
+            if (abs(linesFromP[i].VP.first - linesFromP[j].VP.first) < 0.0001) {
+                tempLine.intermediaryPoints.push_back(linesFromP[j].VP.second);
             }
         }
         i += tempLine.intermediaryPoints.size() / 2;
