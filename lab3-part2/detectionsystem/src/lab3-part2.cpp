@@ -19,18 +19,19 @@ struct Point {
 };
 
 struct LineSegment {
-    Point start = Point{0, 0};
-    Point end = Point{0, 0};
-    double slope = 0.0;
-    double length = 0.0;
-    double m = 0.0;
+    //Point start = Point{0, 0};
+    //Point end = Point{0, 0};
+    //double slope = 0.0;
+    //double length = 0.0;
+    //double m = 0.0;
+    std::pair<double, Point> VP = {};
 };
 
 struct CompleteLine {
     // Point start = Point{0, 0};
     // Point end = Point{0, 0};
     std::vector<Point> intermediaryPoints = {};
-    double slope = 0.0;
+    //double slope = 0.0;
     // double m = 0.0;
 };
 
@@ -38,23 +39,7 @@ struct CompleteLine {
 //
 //   jag hatar denna klass s� mycket. Like varf�r �r det en class som bara hanterar slope och vector
 //   av linesegment vi kommer bara beh�va 1 vector och ber�kna slope kan vara en funktion.
-class Lines {
-public:
-    Lines();             // constructor
-    ~Lines() = default;  // destructor
 
-    void calcSlope(LineSegment&);
-
-private:
-    std::vector<LineSegment> lineVec;
-};
-
-Lines::Lines() {}
-
-void Lines::calcSlope(LineSegment& L) {
-    L.slope = (L.end.y - L.start.y) / (L.end.x - L.start.x);
-}  // vill vi att den ber�knar f�r en eller f�r alla och ska den returnera n�got eller vill vi ta
-   // byrefrence
 
 std::vector<Point> fileReader(const std::string& filename) {
     std::filesystem::path points_name = filename;
@@ -118,55 +103,69 @@ double calcSlope(Point& start, Point& end) {
     return num / den;
 }
 
-double calcLength(LineSegment& L) {
-    double x = L.end.x - L.start.x;
-    double y = L.end.y - L.start.y;
-    return sqrt(x * x + y * y);
-}
+//double calcLength(LineSegment& L) {
+//    double x = L.end.x - L.start.x;
+//    double y = L.end.y - L.start.y;
+//    return sqrt(x * x + y * y);
+//}
 
 // naive implementation of linesegment
-void cookLineSegments(std::vector<Point>& PV, std::vector<std::pair<double, Point>>& VP) {
+void cookLineSegments(std::vector<Point>& PV, std::vector<std::vector<LineSegment>>& allLines
+                      /*std::vector<std::pair<double, Point>>& VP*/) {
     for (int i = 0; i < std::ssize(PV); i++) {
+        std::vector<LineSegment> linesFromP;
         for (int j = i + 1; j < std::ssize(PV); j++) {
 
             //LineSegment temp = LineSegment{PV[i], PV[j], calcSlope(PV[i], PV[j])};  
 
-            std::pair<double, Point> tempp;
-            tempp.first = calcSlope(PV[i], PV[j]);
-            tempp.second = PV[j];
+            //std::pair<double, Point> tempp;
+            //tempp.first = calcSlope(PV[i], PV[j]);
+            //tempp.second = PV[j];
+            LineSegment tempo;
+            tempo.VP.first = calcSlope(PV[i], PV[j]);
+            tempo.VP.second = PV[j];
+            linesFromP.push_back(tempo);
 
             // temp.m = temp.start.y - temp.slope * temp.start.x;  // m = y - kx
             //  temp.length = calcLength(temp);
 
-            VP.push_back(tempp);  // n om vi inte reservar
+            //VP.push_back(tempp);  // n om vi inte reservar
         }
+        allLines.push_back(linesFromP);
     }
 }
 
 bool operator<(const LineSegment& LeftLineSeg,
                const LineSegment& RightLineSeg) {  // used in stablesort
-    return LeftLineSeg.slope < RightLineSeg.slope;
+    return LeftLineSeg.VP.first < RightLineSeg.VP.first;
 }
 
-void findCollinearPoints(std::vector<LineSegment>& LV, std::vector<CompleteLine>& CLV) {
-    for (size_t i = 0; i < std::ssize(LV);) {
+void findCollinearPoints(
+    std::vector<std::vector<LineSegment>>&
+        allLines /*std::vector<LineSegment>& LV*/ /*, std::vector<CompleteLine>& CLV*/) {
+    for (size_t i = 0; i < std::ssize(allLines);) {
         CompleteLine tempLine;
+        tempLine.intermediaryPoints.push_back(allLines[i][0].VP.second);
 
-        for (size_t j = i; j < std::ssize(LV); j++) {
-            if (LV[i].slope != LV[j].slope) {
-                break;
-            }
-            if (LV[i].m == LV[j].m || (LV[i].slope == -1 && LV[i].start.x == LV[j].start.x)) {
-                tempLine.intermediaryPoints.push_back(LV[j].start);
-                tempLine.intermediaryPoints.push_back(LV[j].end);
+        for (size_t j = i; j < std::ssize(allLines[i]); j++) {
+            //if (LV[i].VP.first != LV[j].VP.first) {
+            //    break;
+            //}
+            //if ( (LV[i].VP.first == -1 && LV[i].VP.second.x == LV[j].VP.second.x)) {
+            //    //tempLine.intermediaryPoints.push_back(LV[j].start);
+            //    tempLine.intermediaryPoints.push_back(LV[j].VP.second);
 
-            } else {
-                // do nothing
+            //} else {
+            //    // do nothing
+            //}
+
+            if (abs(allLines[i][j].VP.first - allLines[i][j+1].VP.first) < 0.0001) {
+                tempLine.intermediaryPoints.push_back(allLines[i][j + 1].VP.second);
             }
         }
         i += tempLine.intermediaryPoints.size() / 2;
         if (tempLine.intermediaryPoints.size() / 2 >= 3) {
-            CLV.push_back(tempLine);
+            //CLV.push_back(tempLine);
         }
     }
 }
@@ -197,8 +196,12 @@ int main() try {
 
     std::cout << "A";
 
-    std::vector<LineSegment> allLines;
-    allLines.reserve(allPoints.size() * allPoints.size());  // lol
+    //std::vector<LineSegment> allLines;
+    //allLines.reserve(allPoints.size() * allPoints.size());  // lol
+
+    //std::vector<std::vector<LineSegment>> setOfAllLines;
+    //setOfAllLines.reserve(allPoints.size() * allPoints.size());  // lol
+    std::vector<std::vector<LineSegment>> allLines;
 
     cookLineSegments(allPoints, allLines);  // n^2, n^3 om vi inte anv�nder reserve
 
