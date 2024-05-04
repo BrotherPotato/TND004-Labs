@@ -113,7 +113,7 @@ void cookLineSegments(std::vector<Point>& PV, std::vector<std::vector<LineSegmen
                       /*std::vector<std::pair<double, Point>>& VP*/) {
     for (int i = 0; i < std::ssize(PV); i++) {
         std::vector<LineSegment> linesFromP;
-        linesFromP.reserve(std::ssize(PV) - i - 1);
+        linesFromP.reserve(std::ssize(PV)); // - i - 1
         for (int j = i + 1; j < std::ssize(PV); j++) {
 
             // LineSegment temp = LineSegment{PV[i], PV[j], calcSlope(PV[i], PV[j])};
@@ -140,15 +140,14 @@ bool operator<(const LineSegment& LeftLineSeg,
     return LeftLineSeg.VP.first < RightLineSeg.VP.first;
 }
 
-void findCollinearPoints(
-    std::vector<std::vector<LineSegment>>& vecLinesFromP /*std::vector<LineSegment>& LV*/,
-    std::vector<CompleteLine>& CLV) {
-    for (size_t i = 0; i < std::ssize(vecLinesFromP); i++) {
+void findCollinearPoints(std::vector<std::vector<LineSegment>>& vecLinesFromP, std::vector<CompleteLine>& CLV) {
+    for (size_t i = 0; i < std::ssize(vecLinesFromP); i++) {  // step through all pointlines O(n)
         CompleteLine tempLine;
-        tempLine.intermediaryPoints.reserve(std::ssize(vecLinesFromP[i]));
-        tempLine.intermediaryPoints.push_back(vecLinesFromP[i][0].VP.second);
+        tempLine.intermediaryPoints.reserve(std::ssize(vecLinesFromP[i]));  // reserve space for all points O(n)
+        //tempLine.intermediaryPoints.push_back(vecLinesFromP[i][0].VP.second);
 
-        //for (size_t j = 0; j < std::ssize(vecLinesFromP[i]); j++) {  // step through all lines with the same start point
+        // for (size_t j = 0; j < std::ssize(vecLinesFromP[i]); j++) {  // step through all lines
+        // with the same start point
 
         //    if (abs(vecLinesFromP[i][j].VP.first - vecLinesFromP[i][j + 1].VP.first) < 0.0001) {
         //        tempLine.intermediaryPoints.push_back(vecLinesFromP[i][j + 1].VP.second);
@@ -158,17 +157,26 @@ void findCollinearPoints(
         //        // tempLine.intermediaryPoints.reserve(std::ssize(vecLinesFromP[i]) - j);
         //    }
         //}
-        int a = 0;
-        for (size_t j = 0; j < std::ssize(vecLinesFromP[i]); j++) {  // step through all lines with the same start point
+        size_t a = 0;
+        for (size_t j = 0; j < std::ssize(vecLinesFromP[i]); j++) {  // step through all lines with the same start point O(n)
+
+            if (vecLinesFromP[i][a].VP.first == std::numeric_limits<double>::infinity() &&
+                vecLinesFromP[i][j].VP.first == std::numeric_limits<double>::infinity()) {
+				tempLine.intermediaryPoints.push_back(vecLinesFromP[i][j].VP.second);
+				continue; // continue goes to the next iteration of the loop
+			}
 
             if (abs(vecLinesFromP[i][a].VP.first - vecLinesFromP[i][j].VP.first) < 0.0001) {
                 tempLine.intermediaryPoints.push_back(vecLinesFromP[i][j].VP.second);
-            } else {
-                a = j;
-                if (tempLine.intermediaryPoints.size() >= 3) {
-					CLV.push_back(tempLine);
-				}
+                continue; // continue goes to the next iteration of the loop
             }
+                
+            a = j;
+                
+            if (tempLine.intermediaryPoints.size() >= 3) {
+                CLV.push_back(tempLine);
+            }
+            
         }
 
         if (tempLine.intermediaryPoints.size() >= 3) {
