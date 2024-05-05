@@ -99,7 +99,7 @@ void writeConsole(std::vector<CompleteLine>& lines) {
         std::cout << "(" << line.intermediaryPoints[0].x << "," << line.intermediaryPoints[0].y << ")";
 
         for (size_t i = 1; i < std::ssize(line.intermediaryPoints); i++) {
-            std::cout << "->(" << line.intermediaryPoints[0].x << "," << line.intermediaryPoints[0].y << ")";
+            std::cout << "->(" << line.intermediaryPoints[i].x << "," << line.intermediaryPoints[i].y << ")";
         }
 
 		std::cout << '\n';
@@ -164,8 +164,12 @@ bool operator<(const LineSegment& LeftLineSeg,
     return LeftLineSeg.VP.first < RightLineSeg.VP.first;
 }
 
-bool operator<(const CompleteLine& LeftLine, const CompleteLine& RightLine) {
-	return LeftLine.intermediaryPoints.size() < RightLine.intermediaryPoints.size();
+bool operator<(const Point& LeftPoint, const Point& RightPoint) {
+    if (abs(LeftPoint.y - RightPoint.y) > 0.0001) {
+        return LeftPoint.x < RightPoint.x;
+    }
+
+	return LeftPoint.y < RightPoint.y;
 }
 
 void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
@@ -258,19 +262,20 @@ int main() try {
 
     
 
-    //for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {
-    //    std::stable_sort(allCompleteLines[i].begin(), allCompleteLines.end());
-    //}
+    for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {
+        std::stable_sort(allCompleteLines[i].intermediaryPoints.begin(),
+                         allCompleteLines[i].intermediaryPoints.end());
+    }
 
     //removeDuplicates(allCompleteLines);
 
-    for (size_t i = 0; i < allCompleteLines.size() - 1; i++) {
+    /*for (size_t i = 0; i < allCompleteLines.size() - 1; i++) {
         std::cout << allCompleteLines[i].intermediaryPoints.size();
         for (size_t j = 0; j < allCompleteLines[i].intermediaryPoints.size() - 1; j++) {
             std::cout << "(" << allCompleteLines[i].intermediaryPoints[j].x << " , ";
             std::cout << allCompleteLines[i].intermediaryPoints[j].y << ") \n";
         }
-    }
+    }*/
 
     //writeFile(allCompleteLines, s);
 
