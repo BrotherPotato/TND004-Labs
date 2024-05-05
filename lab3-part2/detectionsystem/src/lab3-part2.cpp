@@ -165,11 +165,11 @@ bool operator<(const LineSegment& LeftLineSeg,
 }
 
 bool operator<(const Point& LeftPoint, const Point& RightPoint) {
-    if (abs(LeftPoint.y - RightPoint.y) > 0.0001) {
-        return LeftPoint.x < RightPoint.x;
+    if (abs(LeftPoint.y - RightPoint.y) < 0.0001) {
+        return LeftPoint.x > RightPoint.x;
     }
 
-	return LeftPoint.y < RightPoint.y;
+	return LeftPoint.y > RightPoint.y;
 }
 
 void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
