@@ -189,19 +189,16 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
 				continue; // continue goes to the next iteration of the loop
 			}
 
-            if (abs(vecLinesFromP[i].lines[a].VP.first -
-                                vecLinesFromP[i].lines[j].VP.first) <
-                            0.0001) {
-                                tempLine.intermediaryPoints.push_back(
-                                    vecLinesFromP[i].lines[j].VP.second);
+            if (abs(vecLinesFromP[i].lines[a].VP.first - vecLinesFromP[i].lines[j].VP.first) < 0.0001) {
+                tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j].VP.second);
                 continue; // continue goes to the next iteration of the loop
             }
                 
             a = j;
                 
-            if (tempLine.intermediaryPoints.size() > 3) {
+            /*if (tempLine.intermediaryPoints.size() > 3) {
                 CLV.push_back(tempLine);
-            }
+            }*/
             
         }
 
@@ -212,17 +209,17 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
 }
 
 void removeDuplicates(std::vector<CompleteLine>& CLV) {
-
+    size_t a = 0;
     for (size_t i = 0; i < std::ssize(CLV); i++) {
-        // std::unique(CLV[i].intermediaryPoints.begin(), CLV[i].intermediaryPoints.end(),
-        //             [&](Point& A, Point& B) { return A.x == B.y && A.y == B.y; });
-        /*CLV[i].intermediaryPoints.erase(
-            std::unique(CLV[i].intermediaryPoints.begin(), CLV[i].intermediaryPoints.end(),
-                        [&](Point& A, Point& B) { return A.x == B.y && A.y == B.y; }));*/
-
-        // for (size_t j = 0; j < CLV[i].intermediaryPoints.size(); j++) {
-
-        //}
+        for (size_t j = 0; j < std::ssize(CLV[i].intermediaryPoints); j++) {
+            if (CLV[a].intermediaryPoints[j].x == CLV[i].intermediaryPoints[j].x &&
+                CLV[a].intermediaryPoints[j].y == CLV[i].intermediaryPoints[j].y) {
+				// delete CLV[i];
+            }
+            else {
+				a = i;
+			}
+        }
 
         // std::cout << "this bitch empty";
     }
@@ -267,7 +264,7 @@ int main() try {
                          allCompleteLines[i].intermediaryPoints.end());
     }
 
-    //removeDuplicates(allCompleteLines);
+    removeDuplicates(allCompleteLines);
 
     /*for (size_t i = 0; i < allCompleteLines.size() - 1; i++) {
         std::cout << allCompleteLines[i].intermediaryPoints.size();
