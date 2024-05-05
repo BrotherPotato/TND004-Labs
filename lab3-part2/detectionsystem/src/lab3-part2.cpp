@@ -96,10 +96,12 @@ void writeConsole(std::vector<CompleteLine>& lines) {
         if (line.intermediaryPoints.size() < 3) {
 			continue;
 		}
-        std::cout << "(" << line.intermediaryPoints[0].x << "," << line.intermediaryPoints[0].y << ")";
+        std::cout << "(" << line.intermediaryPoints[0].x * 32767.0 << ","
+                          << line.intermediaryPoints[0].y * 32767.0 << ")";
 
         for (size_t i = 1; i < std::ssize(line.intermediaryPoints); i++) {
-            std::cout << "->(" << line.intermediaryPoints[i].x << "," << line.intermediaryPoints[i].y << ")";
+                        std::cout << "->(" << line.intermediaryPoints[i].x * 32767.0 << ","
+                                  << line.intermediaryPoints[i].y * 32767.0 << ")";
         }
 
 		std::cout << '\n';
@@ -166,7 +168,7 @@ bool operator<(const LineSegment& LeftLineSeg,
 
 bool operator<(const Point& LeftPoint, const Point& RightPoint) {
     if (abs(LeftPoint.y - RightPoint.y) < 0.0001) {
-        return LeftPoint.x > RightPoint.x;
+        return LeftPoint.x < RightPoint.x;
     }
 
 	return LeftPoint.y > RightPoint.y;
