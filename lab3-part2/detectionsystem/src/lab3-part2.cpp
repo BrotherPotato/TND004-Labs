@@ -172,6 +172,10 @@ bool operator<(const Point& LeftPoint, const Point& RightPoint) {
 	return LeftPoint.y > RightPoint.y;
 }
 
+bool operator<(const CompleteLine& LeftLine, const CompleteLine& RightLine) {
+	return LeftLine.intermediaryPoints[0].x > RightLine.intermediaryPoints[0].x;
+}
+
 void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
                          std::vector<CompleteLine>& CLV) {
     for (size_t i = 0; i < std::ssize(vecLinesFromP); i++) {  // step through all pointlines O(n)
@@ -263,6 +267,8 @@ int main() try {
         std::stable_sort(allCompleteLines[i].intermediaryPoints.begin(),
                          allCompleteLines[i].intermediaryPoints.end());
     }
+
+    std::stable_sort(allCompleteLines.begin(), allCompleteLines.end());
 
     removeDuplicates(allCompleteLines);
 
