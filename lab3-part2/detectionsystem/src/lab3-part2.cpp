@@ -168,14 +168,14 @@ bool operator<(const LineSegment& LeftLineSeg,
 
 bool operator<(const Point& LeftPoint, const Point& RightPoint) {
     if (abs(LeftPoint.y - RightPoint.y) < 0.0001) {
-        return LeftPoint.x < RightPoint.x;
+        return LeftPoint.x > RightPoint.x;
     }
 
-	return LeftPoint.y > RightPoint.y;
+	return LeftPoint.y < RightPoint.y;
 }
 
 bool operator<(const CompleteLine& LeftLine, const CompleteLine& RightLine) {
-	return LeftLine.intermediaryPoints[0].x > RightLine.intermediaryPoints[0].x;
+	return LeftLine.intermediaryPoints[0].y < RightLine.intermediaryPoints[0].y;
 }
 
 void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
@@ -215,20 +215,20 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
 }
 
 void removeDuplicates(std::vector<CompleteLine>& CLV) {
-    size_t a = 0;
-    for (size_t i = 0; i < std::ssize(CLV); i++) {
-        for (size_t j = 0; j < std::ssize(CLV[i].intermediaryPoints); j++) {
-            if (CLV[a].intermediaryPoints[j].x == CLV[i].intermediaryPoints[j].x &&
-                CLV[a].intermediaryPoints[j].y == CLV[i].intermediaryPoints[j].y) {
-				// delete CLV[i];
-            }
-            else {
-				a = i;
-			}
-        }
+   // size_t a = 0;
+   // for (size_t i = 0; i < std::ssize(CLV); i++) {
+   //     for (size_t j = 0; j < std::ssize(CLV[i].intermediaryPoints); j++) {
+   //         if (CLV[a].intermediaryPoints[j].x == CLV[i].intermediaryPoints[j].x &&
+   //             CLV[a].intermediaryPoints[j].y == CLV[i].intermediaryPoints[j].y) {
+			//	// delete CLV[i];
+   //         }
+   //         else {
+			//	a = i;
+			//}
+   //     }
 
-        // std::cout << "this bitch empty";
-    }
+   //     // std::cout << "this bitch empty";
+   // }
 }
 
 int main() try {
@@ -248,6 +248,8 @@ int main() try {
 
     // sortera också points?
 
+    //std::stable_sort(allPoints.begin(), allPoints.end());
+
     std::vector<LinesFromPoint> allLines;
 
     cookLineSegments(allPoints, allLines);  // n^2, n^3 om vi inte anv�nder reserve
@@ -261,7 +263,7 @@ int main() try {
 
     findCollinearPoints(allLines, allCompleteLines);
 
-    std::cout << "SUMSUM: " << allCompleteLines.size();
+    std::cout << "SUMSUM: " << allCompleteLines.size() << "\n";
 
     
 
