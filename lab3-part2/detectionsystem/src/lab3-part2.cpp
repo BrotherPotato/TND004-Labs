@@ -128,11 +128,11 @@ double calcSlope(Point& start, Point& end) {
 // naive implementation of linesegment
 void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLines
                       /*std::vector<std::pair<double, Point>>& VP*/) {
-    for (int i = 0; i < std::ssize(PV); i++) {  // O(n)
+    for (int i = 0; i < std::ssize(PV); i++) {  // O(n) 
         LinesFromPoint linesFromP;
         linesFromP.lines.reserve(std::ssize(PV));  // - i - 1
         linesFromP.start = PV[i];
-        for (int j = i + 1; j < std::ssize(PV); j++) {
+        for (int j = i + 1; j < std::ssize(PV); j++) { // O(m)
 
             LineSegment tempo;
             tempo.VP.first = calcSlope(PV[i], PV[j]);
@@ -198,7 +198,7 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
         size_t a = 0;
         tempLine.slope = vecLinesFromP[i].slope;
         tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start);
-        for (size_t j = 0; j < std::ssize(vecLinesFromP[i].lines);
+        for (size_t j = 0; j < std::ssize(vecLinesFromP[i].lines); //O(n)
              j++) {  // step through all lines with the same start point O(n)
             double first = vecLinesFromP[i].lines[a].VP.first;
             double second = vecLinesFromP[i].lines[j].VP.first;
@@ -228,8 +228,6 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
     }
 }
 
-void removeDuplicates(std::vector<CompleteLine>& CLV) {}
-
 int main() try {
     std::cout << "Enter the name of input points file: ";
     std::string s;
@@ -251,7 +249,7 @@ int main() try {
 
     std::vector<LinesFromPoint> allLines;
 
-    cookLineSegments(allPoints, allLines);  // n^2, n^3 om vi inte anv�nder reserve
+    cookLineSegments(allPoints, allLines);  // O(n+m)
 
     // sort lines by slope 2. in pdf
     std::sort(allLines.begin(), allLines.end());  // nlogn
@@ -263,28 +261,18 @@ int main() try {
 
     std::vector<CompleteLine> allCompleteLines;
 
-    findCollinearPoints(allLines, allCompleteLines);
+    findCollinearPoints(allLines, allCompleteLines); //n^2
 
-    // remove duplicates
-
-    std::cout << "SUMSUM: " << allCompleteLines.size() << "\n";
+    //std::cout << "SUMSUM: " << allCompleteLines.size() << "\n";
 
     for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {  // n^2logn
         std::sort(allCompleteLines[i].intermediaryPoints.begin(),
                   allCompleteLines[i].intermediaryPoints.end());
     }
 
-    std::sort(allCompleteLines.begin(), allCompleteLines.end());
+    std::sort(allCompleteLines.begin(), allCompleteLines.end()); //nlogn
 
     // removeDuplicates(allCompleteLines);
-
-    /*for (size_t i = 0; i < allCompleteLines.size() - 1; i++) {
-        std::cout << allCompleteLines[i].intermediaryPoints.size();
-        for (size_t j = 0; j < allCompleteLines[i].intermediaryPoints.size() - 1; j++) {
-            std::cout << "(" << allCompleteLines[i].intermediaryPoints[j].x << " , ";
-            std::cout << allCompleteLines[i].intermediaryPoints[j].y << ") \n";
-        }
-    }*/
 
     // writeFile(allCompleteLines, s);
 
