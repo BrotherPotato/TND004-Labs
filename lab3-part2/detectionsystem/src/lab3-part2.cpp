@@ -198,8 +198,7 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
         size_t a = 0;
         tempLine.slope = vecLinesFromP[i].slope;
         tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start);
-        for (size_t j = 0; j < std::ssize(vecLinesFromP[i].lines); //O(n)
-             j++) {  // step through all lines with the same start point O(n)
+        for (size_t j = 0; j < std::ssize(vecLinesFromP[i].lines); j++) { //O(n) // step through all lines with the same start point O(n)
             double first = vecLinesFromP[i].lines[a].VP.first;
             double second = vecLinesFromP[i].lines[j].VP.first;
             if (first == std::numeric_limits<double>::infinity() &&
@@ -209,7 +208,7 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
                 continue;  // continue goes to the next iteration of the loop
             }
 
-            if (abs(first - second) < 1e-5) {
+            if (abs(first - second) < 1e-10) {
 
                 tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j].VP.second);
                 continue;  // continue goes to the next iteration of the loop
@@ -235,7 +234,7 @@ int main() try {
 
     std::vector<Point> allPoints = fileReader(s);
 
-    std::cout << "A";
+    //std::cout << "A";
 
     // std::vector<LineSegment> allLines;
     // allLines.reserve(allPoints.size() * allPoints.size());  // lol
