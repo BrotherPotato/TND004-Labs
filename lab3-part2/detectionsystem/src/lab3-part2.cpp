@@ -176,6 +176,16 @@ bool operator<(const Point& LeftPoint, const Point& RightPoint) {
 	return LeftPoint.y < RightPoint.y;
 }
 
+bool operator<(const LinesFromPoint& LeftLinePoint, const LinesFromPoint& RightLinePoint) {
+        if (LeftLinePoint.slope == std::numeric_limits<double>::infinity()) {
+            return true;
+        } else if (RightLinePoint.slope == std::numeric_limits<double>::infinity()) {
+            return false;
+        }
+
+        return LeftLinePoint.slope < RightLinePoint.slope;
+}
+
 bool operator<(const CompleteLine& LeftLine, const CompleteLine& RightLine) {
 	return LeftLine.intermediaryPoints[0].y < RightLine.intermediaryPoints[0].y;
 }
@@ -191,15 +201,16 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
         tempLine.slope = vecLinesFromP[i].slope;
         tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start);
         for (size_t j = 0; j < std::ssize(vecLinesFromP[i].lines); j++) {  // step through all lines with the same start point O(n)
-
-            if (vecLinesFromP[i].lines[a].VP.first == std::numeric_limits<double>::infinity() &&
-                vecLinesFromP[i].lines[j].VP.first == std::numeric_limits<double>::infinity()) {
+            double first = vecLinesFromP[i].lines[a].VP.first;
+            double second = vecLinesFromP[i].lines[j].VP.first;
+            if (first == std::numeric_limits<double>::infinity() &&
+                second == std::numeric_limits<double>::infinity()) {
                 
                 tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j].VP.second);
 				continue; // continue goes to the next iteration of the loop
 			}
 
-            if (abs(vecLinesFromP[i].lines[a].VP.first - vecLinesFromP[i].lines[j].VP.first) < 0.0001) {
+            if (abs(first - second) < 0.0001) {
                
                 tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j].VP.second);
                 continue; // continue goes to the next iteration of the loop
@@ -257,6 +268,10 @@ int main() try {
 
     // TODO: ta bort alla kopior
     // TODO: sl� ihop linjer
+
+    for (size_t i = 0; i < std::ssize(allLines); i++) {
+        std::stable_sort(allLines[i].lines.begin(), allLines[i].lines.end());
+    }
 
     std::vector<CompleteLine> allCompleteLines;
 
