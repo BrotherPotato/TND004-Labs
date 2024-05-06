@@ -18,7 +18,7 @@ struct Point {
     double y = 0.0;
 };
 
-struct LineSegment {
+struct LineSegment { //värdelös jälva struct
     // Point start = Point{0, 0};
     // Point end = Point{0, 0};
     // double slope = 0.0;
@@ -30,13 +30,14 @@ struct LineSegment {
 struct LinesFromPoint {
 	Point start = Point{0, 0};
 	std::vector<LineSegment> lines = {};
+    double slope = 0.0;
 };
 
 struct CompleteLine {
     // Point start = Point{0, 0};
     // Point end = Point{0, 0};
     std::vector<Point> intermediaryPoints = {};
-    // double slope = 0.0;
+    double slope = 0.0;
     //  double m = 0.0;
 };
 
@@ -132,7 +133,7 @@ double calcSlope(Point& start, Point& end) {
 
 // naive implementation of linesegment
 void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLines
-                      /*std::vector<std::pair<double, Point>>& VP*/) {
+                      /*std::vector<std::pair<double, Point>>& VP*/)    {
     for (int i = 0; i < std::ssize(PV); i++) { // O(n)
         LinesFromPoint linesFromP;
         linesFromP.lines.reserve(std::ssize(PV)); // - i - 1
@@ -147,6 +148,7 @@ void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLi
             LineSegment tempo;
             tempo.VP.first = calcSlope(PV[i], PV[j]);
             tempo.VP.second = PV[j];
+            linesFromP.slope = tempo.VP.first;
             linesFromP.lines.push_back(tempo);
 
             // temp.m = temp.start.y - temp.slope * temp.start.x;  // m = y - kx
@@ -186,19 +188,23 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
         //tempLine.intermediaryPoints.push_back(vecLinesFromP[i][0].VP.second);
 
         size_t a = 0;
+        tempLine.slope = vecLinesFromP[i].slope;
         tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start);
         for (size_t j = 0; j < std::ssize(vecLinesFromP[i].lines); j++) {  // step through all lines with the same start point O(n)
 
             if (vecLinesFromP[i].lines[a].VP.first == std::numeric_limits<double>::infinity() &&
                 vecLinesFromP[i].lines[j].VP.first == std::numeric_limits<double>::infinity()) {
+                
                 tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j].VP.second);
 				continue; // continue goes to the next iteration of the loop
 			}
 
             if (abs(vecLinesFromP[i].lines[a].VP.first - vecLinesFromP[i].lines[j].VP.first) < 0.0001) {
+               
                 tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j].VP.second);
                 continue; // continue goes to the next iteration of the loop
             }
+            
                 
             a = j;
                 
@@ -215,20 +221,13 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
 }
 
 void removeDuplicates(std::vector<CompleteLine>& CLV) {
-   // size_t a = 0;
-   // for (size_t i = 0; i < std::ssize(CLV); i++) {
-   //     for (size_t j = 0; j < std::ssize(CLV[i].intermediaryPoints); j++) {
-   //         if (CLV[a].intermediaryPoints[j].x == CLV[i].intermediaryPoints[j].x &&
-   //             CLV[a].intermediaryPoints[j].y == CLV[i].intermediaryPoints[j].y) {
-			//	// delete CLV[i];
-   //         }
-   //         else {
-			//	a = i;
-			//}
-   //     }
-
-   //     // std::cout << "this bitch empty";
-   // }
+    if (CLV.size() >= 1) {
+        for (size_t i = 1; i < CLV.size(); i++) {
+            if (CLV[i].slope == CLV[i - 1].slope) {
+                CLV.erase(CLV.begin() + i);
+            }
+        }
+    }
 }
 
 int main() try {
@@ -248,7 +247,7 @@ int main() try {
 
     // sortera också points?
 
-    //std::stable_sort(allPoints.begin(), allPoints.end());
+    std::stable_sort(allPoints.begin(), allPoints.end());
 
     std::vector<LinesFromPoint> allLines;
 
@@ -264,10 +263,9 @@ int main() try {
     findCollinearPoints(allLines, allCompleteLines);
 
     std::cout << "SUMSUM: " << allCompleteLines.size() << "\n";
-
     
 
-    for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {
+    for (size_t i = 0; i < std::ssize(allCompleteLines); i++) { //n^2logn
         std::stable_sort(allCompleteLines[i].intermediaryPoints.begin(),
                          allCompleteLines[i].intermediaryPoints.end());
     }
