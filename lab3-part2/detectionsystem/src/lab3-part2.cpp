@@ -99,7 +99,7 @@ void writeConsole(std::vector<CompleteLine>& lines) {
         if (line.intermediaryPoints.size() < 3) {
             continue;
         }
-        std::cout << "(" << line.intermediaryPoints[0].x * 32767.0 << ","
+        std::cout << line.slope << ": (" << line.intermediaryPoints[0].x * 32767.0 << ","
                   << line.intermediaryPoints[0].y * 32767.0 << ")";
 
         for (size_t i = 1; i < std::ssize(line.intermediaryPoints); i++) {
@@ -269,21 +269,22 @@ void deleteDuplicates(std::vector<CompleteLine>& allCompleteLines) {
     std::vector<bool> duplicates(allCompleteLines.size(), false);
     for (size_t i = 0; i < std::ssize(allCompleteLines) - 1; i++) {
         // size_t a = i;
-        if (abs(allCompleteLines[i].slope - allCompleteLines[i + 1].slope) < 1e-10) {
-            for (size_t j = 0; j < std::ssize(allCompleteLines[i].intermediaryPoints); j++) {
-                if (allCompleteLines.size() > 1) {
-                    if (abs(allCompleteLines[i].intermediaryPoints[j].x -
-                            allCompleteLines[i + 1].intermediaryPoints[0].x) < 1e-10 &&
-                        abs(allCompleteLines[i].intermediaryPoints[j].y -
-                            allCompleteLines[i + 1].intermediaryPoints[0].y) < 1e-10) {
-                        duplicates[i + 1] = true;
-                    }
+        if ((abs(allCompleteLines[i].slope - allCompleteLines[i + 1].slope) < 1e-10) ||
+            (allCompleteLines[i].slope == std::numeric_limits<double>::infinity() &&
+             allCompleteLines[i+1].slope == std::numeric_limits<double>::infinity())) {
+            for (size_t j = 0; j < std::ssize(allCompleteLines[i].intermediaryPoints); j++) {  // step through the first line
+                if (abs(allCompleteLines[i].intermediaryPoints[j].x -
+                        allCompleteLines[i + 1].intermediaryPoints[0].x) < 1e-10 &&
+                    abs(allCompleteLines[i].intermediaryPoints[j].y -
+                        allCompleteLines[i + 1].intermediaryPoints[0].y) < 1e-10) {
+                    duplicates[i + 1] = true;
+                    //break;
                 }
             }
         }
     }
 
-    for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {
+    for (size_t i = std::ssize(allCompleteLines) - 1; i > 0; i--) {
         if (duplicates[i]) {
             allCompleteLines.erase(allCompleteLines.begin() + i);
         }
@@ -317,7 +318,17 @@ int main() try {
     // std::sort(allLines.begin(), allLines.end());  // nlogn
 
     for (size_t i = 0; i < std::ssize(allLines); i++) {
-        std::stable_sort(allLines[i].lines.begin(), allLines[i].lines.begin());
+        std::sort(allLines[i].lines.begin(), allLines[i].lines.begin(),
+                  [](const LineSegment& a, const LineSegment& b) -> bool {
+                      if (a.VP.first == std::numeric_limits<double>::infinity() &&
+                          b.VP.first != std::numeric_limits<double>::infinity()) {
+                          return false;
+                      } else if (b.VP.first == std::numeric_limits<double>::infinity()) {
+                          return true;
+                      }
+
+                      return a.VP.first < b.VP.first;
+                  });
     }
 
     // TODO: ta bort alla kopior
@@ -335,22 +346,22 @@ int main() try {
         std::sort(allCompleteLines[i].intermediaryPoints.begin(),
                   allCompleteLines[i].intermediaryPoints.end(),
                   [](const Point& a, const Point& b) -> bool {
-                    if (abs(a.y - b.y) < 1e-10) {
-						  return a.x < b.x;
-					  }
+                      if (abs(a.y - b.y) < 1e-10) {
+                          return a.x < b.x;
+                      }
 
-					  return a.y < b.y;
-            });
+                      return a.y < b.y;
+                  });
     }
 
     std::sort(allCompleteLines.begin(), allCompleteLines.end(),
               [](const CompleteLine& a, const CompleteLine& b) -> bool {
                   if (abs(a.intermediaryPoints[0].y - b.intermediaryPoints[0].y) < 1e-10) {
-                    return a.intermediaryPoints[0].x < b.intermediaryPoints[0].x;
+                      return a.intermediaryPoints[0].x < b.intermediaryPoints[0].x;
                   }
 
-        		  return a.intermediaryPoints[0].y < b.intermediaryPoints[0].y;
-        });  // nlogn
+                  return a.intermediaryPoints[0].y < b.intermediaryPoints[0].y;
+              });  // nlogn
 
     deleteDuplicates(allCompleteLines);
 
