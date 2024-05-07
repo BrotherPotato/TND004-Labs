@@ -32,7 +32,7 @@ struct LineSegment {  // värdelös jälva struct
 struct LinesFromPoint {
     Point start = Point{0, 0};
     std::vector<LineSegment> lines = {};
-    double slope = 0.0;
+    // double slope = 0.0;
 };
 
 struct CompleteLine {
@@ -139,7 +139,7 @@ void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLi
             LineSegment tempo;
             tempo.VP.first = calcSlope(PV[i], PV[j]);
             tempo.VP.second = PV[j];
-            linesFromP.slope = tempo.VP.first;
+            // linesFromP.slope = tempo.VP.first;
             linesFromP.lines.push_back(tempo);
         }
         allLines.push_back(linesFromP);
@@ -148,6 +148,14 @@ void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLi
 
 bool operator<(const LineSegment& LeftLineSeg,
                const LineSegment& RightLineSeg) {  // used in stablesort
+    if (LeftLineSeg.VP.first == std::numeric_limits<double>::infinity() &&
+        RightLineSeg.VP.first != std::numeric_limits<double>::infinity()) {
+        return true;
+    } else if (RightLineSeg.VP.first == std::numeric_limits<double>::infinity()) {
+        // om LLP == RLP så är false fortfarande korrekt :))
+        return false;
+    }
+
     return LeftLineSeg.VP.first < RightLineSeg.VP.first;
 }
 
@@ -160,15 +168,15 @@ bool operator<(const Point& LeftPoint, const Point& RightPoint) {
 }
 
 bool operator<(const LinesFromPoint& LeftLinePoint, const LinesFromPoint& RightLinePoint) {
-    if (LeftLinePoint.slope == std::numeric_limits<double>::infinity() &&
-        RightLinePoint.slope != std::numeric_limits<double>::infinity()) {
+    if (LeftLinePoint.lines[0].VP.first == std::numeric_limits<double>::infinity() &&
+        RightLinePoint.lines[0].VP.first != std::numeric_limits<double>::infinity()) {
         return true;
-    } else if (RightLinePoint.slope == std::numeric_limits<double>::infinity()) {
+    } else if (RightLinePoint.lines[0].VP.first == std::numeric_limits<double>::infinity()) {
         // om LLP == RLP så är false fortfarande korrekt :))
         return false;
     }
 
-    return LeftLinePoint.slope < RightLinePoint.slope;
+    return LeftLinePoint.lines[0].VP.first < RightLinePoint.lines[0].VP.first;
 }
 
 bool operator<(CompleteLine& LeftLine, CompleteLine& RightLine) {
@@ -186,8 +194,8 @@ bool operator<(CompleteLine& LeftLine, CompleteLine& RightLine) {
     //    }
     //
     //    return LeftSlope < RightSlope;
-
-    return LeftLine.intermediaryPoints[0].y < RightLine.intermediaryPoints[0].y;
+    return LeftLine.slope < RightLine.slope;
+    // return LeftLine.intermediaryPoints[0].y < RightLine.intermediaryPoints[0].y;
 }
 
 void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
@@ -199,7 +207,7 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
         // tempLine.intermediaryPoints.push_back(vecLinesFromP[i][0].VP.second);
 
         size_t a = 0;
-        tempLine.slope = vecLinesFromP[i].slope;
+
         tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start);
         for (size_t j = 0; j < std::ssize(vecLinesFromP[i].lines);
              j++) {  // O(n) // step through all lines with the same start point O(n)
@@ -232,6 +240,8 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
         }
 
         if (tempLine.intermediaryPoints.size() > 3) {
+            tempLine.slope =
+                calcSlope(tempLine.intermediaryPoints[0], tempLine.intermediaryPoints[1]);
             CLV.push_back(tempLine);
         }
 
@@ -239,20 +249,45 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
 
     }  // for std::ssize(vecLinesFromP)
 
-    //if (CLV.size() > 1) {
-    //    for (size_t i = 0; i < CLV.size(); i++) {
-    //        for (size_t j = 1; j < std::ssize(CLV[i].intermediaryPoints); j++) {
-    //            if (CLV.size() > 1) {
-    //                if (CLV[i].slope == CLV[j].slope) {
-    //                    if (CLV[i].intermediaryPoints[i].x == CLV[j].intermediaryPoints[j].x ||
-    //                        CLV[i].intermediaryPoints[i].y == CLV[j].intermediaryPoints[j].y) {
-    //                        CLV.erase(CLV.begin() + j);
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
+    // if (CLV.size() > 1) {
+    //     for (size_t i = 0; i < CLV.size(); i++) {
+    //         for (size_t j = 1; j < std::ssize(CLV[i].intermediaryPoints); j++) {
+    //             if (CLV.size() > 1) {
+    //                 if (CLV[i].slope == CLV[j].slope) {
+    //                     if (CLV[i].intermediaryPoints[i].x == CLV[j].intermediaryPoints[j].x ||
+    //                         CLV[i].intermediaryPoints[i].y == CLV[j].intermediaryPoints[j].y) {
+    //                         CLV.erase(CLV.begin() + j);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+}
+
+void deleteDuplicates(std::vector<CompleteLine>& allCompleteLines) {
+    std::vector<bool> duplicates(allCompleteLines.size(), false);
+    for (size_t i = 0; i < std::ssize(allCompleteLines) - 1; i++) {
+        // size_t a = i;
+        if (abs(allCompleteLines[i].slope - allCompleteLines[i + 1].slope) < 1e-10) {
+            for (size_t j = 0; j < std::ssize(allCompleteLines[i].intermediaryPoints); j++) {
+                if (allCompleteLines.size() > 1) {
+                    if (abs(allCompleteLines[i].intermediaryPoints[j].x -
+                            allCompleteLines[i + 1].intermediaryPoints[0].x) < 1e-10 &&
+                        abs(allCompleteLines[i].intermediaryPoints[j].y -
+                            allCompleteLines[i + 1].intermediaryPoints[0].y) < 1e-10) {
+                        duplicates[i + 1] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {
+        if (duplicates[i]) {
+            allCompleteLines.erase(allCompleteLines.begin() + i);
+        }
+    }
 }
 
 int main() try {
@@ -279,7 +314,11 @@ int main() try {
     cookLineSegments(allPoints, allLines);  // O(n+m)
 
     // sort lines by slope 2. in pdf
-    std::sort(allLines.begin(), allLines.end());  // nlogn
+    // std::sort(allLines.begin(), allLines.end());  // nlogn
+
+    for (size_t i = 0; i < std::ssize(allLines); i++) {
+        std::stable_sort(allLines[i].lines.begin(), allLines[i].lines.begin());
+    }
 
     // TODO: ta bort alla kopior
     // TODO: sl� ihop linjer
@@ -294,10 +333,26 @@ int main() try {
 
     for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {  // n^2logn
         std::sort(allCompleteLines[i].intermediaryPoints.begin(),
-                  allCompleteLines[i].intermediaryPoints.end());
+                  allCompleteLines[i].intermediaryPoints.end(),
+                  [](const Point& a, const Point& b) -> bool {
+                    if (abs(a.y - b.y) < 1e-10) {
+						  return a.x < b.x;
+					  }
+
+					  return a.y < b.y;
+            });
     }
 
-    std::sort(allCompleteLines.begin(), allCompleteLines.end());  // nlogn
+    std::sort(allCompleteLines.begin(), allCompleteLines.end(),
+              [](const CompleteLine& a, const CompleteLine& b) -> bool {
+                  if (abs(a.intermediaryPoints[0].y - b.intermediaryPoints[0].y) < 1e-10) {
+                    return a.intermediaryPoints[0].x < b.intermediaryPoints[0].x;
+                  }
+
+        		  return a.intermediaryPoints[0].y < b.intermediaryPoints[0].y;
+        });  // nlogn
+
+    deleteDuplicates(allCompleteLines);
 
     // writeFile(allCompleteLines, s);
 
