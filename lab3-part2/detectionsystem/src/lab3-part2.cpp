@@ -15,6 +15,8 @@ void plotData(const std::string& name);
 
 /* ************************************* */
 
+const double delta = 1e-10;
+
 struct Point {
     double x = 0.0;
     double y = 0.0;
@@ -50,7 +52,7 @@ struct CompleteLine {
 
 std::vector<Point> fileReader(const std::string& filename) {
     std::filesystem::path points_name =
-        "C:/Programmering/TND004/TND004-Labs/lab3-part2/detectionsystem/data/" + filename;
+        "C:/Github/TND004-Labs/lab3-part2/detectionsystem/data/" + filename;
     std::cout << points_name << '\n';
     std::ifstream pointsFile(points_name);
 
@@ -77,7 +79,7 @@ std::vector<Point> fileReader(const std::string& filename) {
 
 void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
     std::filesystem::path points_name =
-        "C:/Programmering/TND004/TND004-Labs/lab3-part2/detectionsystem/data/output/segments-" +
+        "C:/Github/TND004-Labs/lab3-part2/detectionsystem/data/output/segments-" +
         readFileName;
     std::cout << points_name << '\n';
     std::ofstream out_file(points_name);
@@ -85,12 +87,10 @@ void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
         std::cout << "Error opening output file!!\n";
         return;
     }
-    // out_file << lines.size() << '\n';
     for (const auto& line : lines) {
         if (line.intermediaryPoints.size() <= 3) {
             continue;
         }
-        // out_file << "(" << line.start.x << "," << line.start.y << ")";
 
         out_file << line.intermediaryPoints[0].x * 32767.0 << " "
                  << line.intermediaryPoints[0].y * 32767.0 << " "
@@ -103,11 +103,13 @@ void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
 }
 
 void writeConsole(std::vector<CompleteLine>& lines) {
+    int index = 0;
     for (const auto& line : lines) {
         if (line.intermediaryPoints.size() < 3) {
             continue;
         }
-        std::cout << line.slope << ": (" << line.intermediaryPoints[0].x * 32767.0 << ","
+        std::cout << index << ": " << line.slope << ": (" << line.intermediaryPoints[0].x * 32767.0
+                  << ","
                   << line.intermediaryPoints[0].y * 32767.0 << ")";
 
         for (size_t i = 1; i < std::ssize(line.intermediaryPoints); i++) {
@@ -116,6 +118,7 @@ void writeConsole(std::vector<CompleteLine>& lines) {
         }
 
         std::cout << '\n';
+        index++;
     }
 }
 
@@ -123,8 +126,6 @@ double calcSlope(Point& start, Point& end) {
     // double temp = (end.y - start.y) / (end.x - start.x);
     double num = end.y - start.y;
     double den = end.x - start.x;
-
-    double delta = 1e-10;
 
     if (abs(num) < delta) {
         return 0.0;
@@ -154,8 +155,7 @@ void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLi
     }
 }
 
-bool operator<(const LineSegment& LeftLineSeg,
-               const LineSegment& RightLineSeg) {  // used in stablesort
+bool operator<(const LineSegment& LeftLineSeg, const LineSegment& RightLineSeg) {  // used in stablesort
     if (LeftLineSeg.VP.first == std::numeric_limits<double>::infinity() &&
         RightLineSeg.VP.first != std::numeric_limits<double>::infinity()) {
         return true;
@@ -221,59 +221,49 @@ bool operator<(CompleteLine& LeftLine, CompleteLine& RightLine) {
  void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
                           std::vector<CompleteLine>& CLV) {
      for (size_t i = 0; i < std::ssize(vecLinesFromP); i++) {  // step through all pointlines O(n)
-         CompleteLine tempLine;
-         tempLine.intermediaryPoints.reserve(
-             std::ssize(vecLinesFromP[i].lines));  // reserve space for all points O(n)
-         // tempLine.intermediaryPoints.push_back(vecLinesFromP[i][0].VP.second);
+         std::vector<CompleteLine> tempLine;
+         tempLine.reserve(5); // donno
+         tempLine.push_back(CompleteLine{});
+         int vecCounter = 0;
+         for (int j = 0; j < std::ssize(vecLinesFromP[i].lines) - 1; j++) {  // O(n) // step through
+            // all lines with the same start point O(n)
+            
+            auto it1 = vecLinesFromP[i].lines[j].VP;
+            auto it2 = vecLinesFromP[i].lines[j + 1].VP;
+            tempLine[vecCounter].intermediaryPoints.push_back(it1.second);
+            if (it1.first == std::numeric_limits<double>::infinity() &&
+                it2.first == std::numeric_limits<double>::infinity()) {
 
-         size_t a = 0;
+                tempLine[vecCounter].intermediaryPoints.push_back(it2.second);
+                std::cout << i << " " << it2.second.x << " " << it2.second.y << '\n';
 
-         tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start);
-         for (size_t j = 0; j < std::ssize(vecLinesFromP[i].lines);j++) {  // O(n) // step through
-         //all lines with the same start point O(n)
+            } else if (abs(it1.first - it2.first) < delta) {
 
-             double first = vecLinesFromP[i].lines[a].VP.first;
-             double second = vecLinesFromP[i].lines[j].VP.first;
-             if (first == std::numeric_limits<double>::infinity() &&
-                 second == std::numeric_limits<double>::infinity()) {
-
-                 tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j].VP.second);
-                 std::cout << i << " " << vecLinesFromP[i].lines[j].VP.second.x << " "
-                           << vecLinesFromP[i].lines[j].VP.second.y << '\n';
-
-                 //continue;  // continue goes to the next iteration of the loop
-             }
-
-             else if (abs(first - second) < 1e-10) {
-
-                 tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j].VP.second);
-                 std::cout << i << " " << vecLinesFromP[i].lines[j].VP.second.x << " "
-                           << vecLinesFromP[i].lines[j].VP.second.y << '\n';
-                 //continue;  // continue goes to the next iteration of the loop
-             } else {
-                 //a = j;
-                 /*if (tempLine.intermediaryPoints.size() > 3) {
-                     tempLine.slope =
-                         calcSlope(tempLine.intermediaryPoints[0],
-                         tempLine.intermediaryPoints[1]);
-                     CLV.push_back(tempLine);*/
-                 }
-             }
-
-             // a = j;
-
-             /**/
-         
-
-         if (tempLine.intermediaryPoints.size() > 3) {
-             tempLine.slope =
-                 calcSlope(tempLine.intermediaryPoints[0], tempLine.intermediaryPoints[1]);
-             CLV.push_back(tempLine);
-             tempLine.intermediaryPoints.clear();
+                tempLine[vecCounter].intermediaryPoints.push_back(it2.second);
+                std::cout << i << " " << it2.second.x << " " << it2.second.y << '\n';
+            } else {
+                // else for early completed line
+                if (tempLine[vecCounter].intermediaryPoints.size() > 3) {
+                    tempLine[vecCounter].slope =
+                        calcSlope(tempLine[vecCounter].intermediaryPoints[0],
+                                  tempLine[vecCounter].intermediaryPoints[1]);
+                    tempLine[vecCounter].intermediaryPoints.push_back(vecLinesFromP[i].start);
+                    CLV.push_back(tempLine[vecCounter]);
+                }
+                vecCounter++;
+                tempLine.push_back(CompleteLine{});
+            }
+            // if completeLine is last of vecLinesFromP[i].lines
+            if (j == std::ssize(vecLinesFromP[i].lines) - 2) {
+                if (tempLine[vecCounter].intermediaryPoints.size() > 3) {
+                    tempLine[vecCounter].slope =
+                        calcSlope(tempLine[vecCounter].intermediaryPoints[0],
+                                  tempLine[vecCounter].intermediaryPoints[1]);
+                    tempLine[vecCounter].intermediaryPoints.push_back(vecLinesFromP[i].start);
+                    CLV.push_back(tempLine[vecCounter]);
+				}
+            }
          }
-
-         // remove duplicates
-
      } 
  }
 
@@ -315,25 +305,23 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
 
 void deleteDuplicates(std::vector<CompleteLine>& allCompleteLines) {
     std::vector<bool> duplicates(allCompleteLines.size(), false);
-    for (size_t i = 0; i < std::ssize(allCompleteLines) - 1; i++) {
-        // size_t a = i;
-        if ((abs(allCompleteLines[i].slope - allCompleteLines[i + 1].slope) < 1e-10) ||
+    for (int i = 0; i < std::ssize(allCompleteLines) - 1; i++) {
+        if ((abs(allCompleteLines[i].slope - allCompleteLines[i + 1].slope) < delta) ||
             (allCompleteLines[i].slope == std::numeric_limits<double>::infinity() &&
              allCompleteLines[i + 1].slope == std::numeric_limits<double>::infinity())) {
             for (size_t j = 0; j < std::ssize(allCompleteLines[i].intermediaryPoints);
                  j++) {  // step through the first line
                 if (abs(allCompleteLines[i].intermediaryPoints[j].x -
-                        allCompleteLines[i + 1].intermediaryPoints[0].x) < 1e-10 &&
+                        allCompleteLines[i + 1].intermediaryPoints[0].x) < delta &&
                     abs(allCompleteLines[i].intermediaryPoints[j].y -
-                        allCompleteLines[i + 1].intermediaryPoints[0].y) < 1e-10) {
+                        allCompleteLines[i + 1].intermediaryPoints[0].y) < delta) {
                     duplicates[i + 1] = true;
-                    // break;
                 }
             }
         }
     }
 
-    for (size_t i = std::ssize(allCompleteLines) - 1; i > 0; i--) {
+    for (int i = std::ssize(allCompleteLines) - 1; i > 0; i--) {
         if (duplicates[i]) {
             allCompleteLines.erase(allCompleteLines.begin() + i);
         }
@@ -347,15 +335,7 @@ int main() try {
 
     std::vector<Point> allPoints = fileReader(s);
 
-    // std::cout << "A";
-
-    // std::vector<LineSegment> allLines;
-    // allLines.reserve(allPoints.size() * allPoints.size());  // lol
-
-    // std::vector<std::vector<LineSegment>> setOfAllLines;
-    // setOfAllLines.reserve(allPoints.size() * allPoints.size());  // lol
-
-    // sortera också points?
+    // reserve?
 
     std::sort(allPoints.begin(), allPoints.end());  //, [](const Point& a, const Point& b) -> bool {
     //    /*if (abs(a.x - b.x) < 1e-16) {
@@ -376,8 +356,6 @@ int main() try {
     cookLineSegments(allPoints, allLines);  // O(n+m)
 
     // sort lines by slope 2. in pdf
-    // std::sort(allLines.begin(), allLines.end());  // nlogn
-    std::cout << "A";
 
     for (size_t i = 0; i < std::ssize(allLines); i++) {
         std::stable_sort(allLines[i].lines.begin(), allLines[i].lines.end(),
@@ -388,7 +366,7 @@ int main() try {
                              } else if (b.VP.first == std::numeric_limits<double>::infinity()) {
                                  return true;
                              }*/
-                             if (abs(a.VP.first - b.VP.first) < 1e-10) {
+                             if (abs(a.VP.first - b.VP.first) < delta) {
                                  return a.VP.second < b.VP.second;
                              }
 
@@ -396,24 +374,16 @@ int main() try {
                          });
     }
 
-    /*
-                  }*/
-    // TODO: ta bort alla kopior
-    // TODO: sl� ihop linjer
-
-    // Vi måste ta bort kopior från allcompleteLines
 
     std::vector<CompleteLine> allCompleteLines;
 
     findCollinearPoints(allLines, allCompleteLines);  // n^2
 
-    // std::cout << "SUMSUM: " << allCompleteLines.size() << "\n";
-
     for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {  // n^2logn
         std::stable_sort(allCompleteLines[i].intermediaryPoints.begin(),
                          allCompleteLines[i].intermediaryPoints.end(),
                          [](const Point& a, const Point& b) -> bool {
-                             if (abs(a.y - b.y) < 1e-10) {
+                             if (abs(a.y - b.y) < delta) {
                                  return a.x < b.x;
                              }
 
@@ -423,14 +393,16 @@ int main() try {
 
     std::stable_sort(allCompleteLines.begin(), allCompleteLines.end(),
                      [](const CompleteLine& a, const CompleteLine& b) -> bool {
-                         if (abs(a.intermediaryPoints[0].y - b.intermediaryPoints[0].y) < 1e-10) {
+                         if (abs(a.intermediaryPoints[0].y - b.intermediaryPoints[0].y) < delta) {
                              return a.intermediaryPoints[0].x < b.intermediaryPoints[0].x;
                          }
 
                          return a.intermediaryPoints[0].y < b.intermediaryPoints[0].y;
                      });  // nlogn
 
+    // Vi måste ta bort kopior från allcompleteLines
     deleteDuplicates(allCompleteLines);
+
     writeFile(allCompleteLines, s);
 
     writeConsole(allCompleteLines);
