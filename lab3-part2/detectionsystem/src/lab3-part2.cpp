@@ -9,6 +9,8 @@
 #include <fmt/format.h>
 #include <limits>
 
+#include <map>
+
 void plotData(const std::string& name);
 
 /* ************************************* */
@@ -128,11 +130,11 @@ double calcSlope(Point& start, Point& end) {
 // naive implementation of linesegment
 void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLines
                       /*std::vector<std::pair<double, Point>>& VP*/) {
-    for (int i = 0; i < std::ssize(PV); i++) {  // O(n) 
+    for (int i = 0; i < std::ssize(PV); i++) {  // O(n)
         LinesFromPoint linesFromP;
-        linesFromP.lines.reserve(std::ssize(PV));  // - i - 1
+        linesFromP.lines.reserve(std::ssize(PV));
         linesFromP.start = PV[i];
-        for (int j = i + 1; j < std::ssize(PV); j++) { // O(m)
+        for (int j = i + 1; j < std::ssize(PV); j++) {  // O(m)
 
             LineSegment tempo;
             tempo.VP.first = calcSlope(PV[i], PV[j]);
@@ -170,19 +172,20 @@ bool operator<(const LinesFromPoint& LeftLinePoint, const LinesFromPoint& RightL
 }
 
 bool operator<(CompleteLine& LeftLine, CompleteLine& RightLine) {
-    //slope ljuger kanske
-//    double LeftSlope = calcSlope(LeftLine.intermediaryPoints[0], LeftLine.intermediaryPoints[1]);
-//    double RightSlope = calcSlope(RightLine.intermediaryPoints[0], RightLine.intermediaryPoints[1]);
-//
-//
-//    if (LeftSlope == std::numeric_limits<double>::infinity() &&
-//        RightSlope != std::numeric_limits<double>::infinity()) {
-//        return true;
-//    }else if (RightSlope == std::numeric_limits<double>::infinity()) {
-//        return false;
-//    }
-//
-//    return LeftSlope < RightSlope;
+    // slope ljuger     kanske
+    //    double LeftSlope = calcSlope(LeftLine.intermediaryPoints[0],
+    //    LeftLine.intermediaryPoints[1]); double RightSlope =
+    //    calcSlope(RightLine.intermediaryPoints[0], RightLine.intermediaryPoints[1]);
+    //
+    //
+    //    if (LeftSlope == std::numeric_limits<double>::infinity() &&
+    //        RightSlope != std::numeric_limits<double>::infinity()) {
+    //        return true;
+    //    }else if (RightSlope == std::numeric_limits<double>::infinity()) {
+    //        return false;
+    //    }
+    //
+    //    return LeftSlope < RightSlope;
 
     return LeftLine.intermediaryPoints[0].y < RightLine.intermediaryPoints[0].y;
 }
@@ -198,23 +201,30 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
         size_t a = 0;
         tempLine.slope = vecLinesFromP[i].slope;
         tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start);
-        for (size_t j = 0; j < std::ssize(vecLinesFromP[i].lines); j++) { //O(n) // step through all lines with the same start point O(n)
+        for (size_t j = 0; j < std::ssize(vecLinesFromP[i].lines);
+             j++) {  // O(n) // step through all lines with the same start point O(n)
+
             double first = vecLinesFromP[i].lines[a].VP.first;
             double second = vecLinesFromP[i].lines[j].VP.first;
             if (first == std::numeric_limits<double>::infinity() &&
                 second == std::numeric_limits<double>::infinity()) {
 
                 tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j].VP.second);
+                std::cout << i << " " << vecLinesFromP[i].lines[j].VP.second.x << " "
+                          << vecLinesFromP[i].lines[j].VP.second.y << '\n';
+
                 continue;  // continue goes to the next iteration of the loop
             }
 
             if (abs(first - second) < 1e-10) {
 
                 tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j].VP.second);
+                std::cout << i << " " << vecLinesFromP[i].lines[j].VP.second.x << " "
+                          << vecLinesFromP[i].lines[j].VP.second.y << '\n';
                 continue;  // continue goes to the next iteration of the loop
             }
 
-            a = j;
+            // a = j;
 
             /*if (tempLine.intermediaryPoints.size() > 3) {
                 CLV.push_back(tempLine);
@@ -224,7 +234,25 @@ void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
         if (tempLine.intermediaryPoints.size() > 3) {
             CLV.push_back(tempLine);
         }
-    }
+
+        // remove duplicates
+
+    }  // for std::ssize(vecLinesFromP)
+
+    //if (CLV.size() > 1) {
+    //    for (size_t i = 0; i < CLV.size(); i++) {
+    //        for (size_t j = 1; j < std::ssize(CLV[i].intermediaryPoints); j++) {
+    //            if (CLV.size() > 1) {
+    //                if (CLV[i].slope == CLV[j].slope) {
+    //                    if (CLV[i].intermediaryPoints[i].x == CLV[j].intermediaryPoints[j].x ||
+    //                        CLV[i].intermediaryPoints[i].y == CLV[j].intermediaryPoints[j].y) {
+    //                        CLV.erase(CLV.begin() + j);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 }
 
 int main() try {
@@ -234,7 +262,7 @@ int main() try {
 
     std::vector<Point> allPoints = fileReader(s);
 
-    //std::cout << "A";
+    // std::cout << "A";
 
     // std::vector<LineSegment> allLines;
     // allLines.reserve(allPoints.size() * allPoints.size());  // lol
@@ -260,18 +288,16 @@ int main() try {
 
     std::vector<CompleteLine> allCompleteLines;
 
-    findCollinearPoints(allLines, allCompleteLines); //n^2
+    findCollinearPoints(allLines, allCompleteLines);  // n^2
 
-    //std::cout << "SUMSUM: " << allCompleteLines.size() << "\n";
+    // std::cout << "SUMSUM: " << allCompleteLines.size() << "\n";
 
     for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {  // n^2logn
         std::sort(allCompleteLines[i].intermediaryPoints.begin(),
                   allCompleteLines[i].intermediaryPoints.end());
     }
 
-    std::sort(allCompleteLines.begin(), allCompleteLines.end()); //nlogn
-
-    // removeDuplicates(allCompleteLines);
+    std::sort(allCompleteLines.begin(), allCompleteLines.end());  // nlogn
 
     // writeFile(allCompleteLines, s);
 
