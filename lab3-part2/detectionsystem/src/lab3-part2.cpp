@@ -146,7 +146,7 @@ void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLi
         LinesFromPoint linesFromP;
         linesFromP.lines.reserve(std::ssize(PV));
         linesFromP.start = PV[i];
-        for (int j = 0; j < std::ssize(PV); j++) {  // O(m)
+        for (int j = 0; j < std::ssize(PV); j++) {  // O(n)
             if (i == j) continue;
             LineSegment tempo;
             tempo.VP.first = calcSlope(PV[i], PV[j]);
@@ -281,15 +281,15 @@ int main() try {
     std::string s;
     std::cin >> s;  // e.g. points1.txt, points200.txt, largeMystery.txt
 
-    std::vector<Point> allPoints = fileReader(s);
+    std::vector<Point> allPoints = fileReader(s);  // O(n)
 
     std::sort(allPoints.begin(), allPoints.end());  
 
     std::vector<LinesFromPoint> allLines;
 
-    allLines.reserve(std::ssize(allPoints) * std::ssize(allPoints));
+    allLines.reserve(std::ssize(allPoints) * (std::ssize(allPoints)-1));
 
-    cookLineSegments(allPoints, allLines);  // O(n+m)
+    cookLineSegments(allPoints, allLines);  // O(n^2)
 
     allPoints.clear();  // clear allPoints O(n)
 
@@ -333,7 +333,7 @@ int main() try {
                          });
     }
 
-    std::stable_sort(allCompleteLines.begin(), allCompleteLines.end(),
+    std::stable_sort(allCompleteLines.begin(), allCompleteLines.end(), // nlogn
                      [](const CompleteLine& a, const CompleteLine& b) -> bool {
                          if (abs(a.intermediaryPoints[0].y - b.intermediaryPoints[0].y) < delta) {
                              if (abs(a.intermediaryPoints[0].x - b.intermediaryPoints[0].x) < delta ) {
@@ -345,7 +345,7 @@ int main() try {
 
                          return a.intermediaryPoints[0].y < b.intermediaryPoints[0].y; 
 
-                     });  // nlogn
+                     });  
 
     // Vi måste ta bort kopior från allcompleteLines
     deleteDuplicates(allCompleteLines);
