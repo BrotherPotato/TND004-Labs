@@ -291,6 +291,8 @@ int main() try {
 
     cookLineSegments(allPoints, allLines);  // O(n+m)
 
+    allPoints.clear();  // clear allPoints O(n)
+
     // sort lines by slope 2. in pdf
 
     for (size_t i = 0; i < std::ssize(allLines); i++) {
@@ -316,6 +318,8 @@ int main() try {
     allCompleteLines.reserve(std::ssize(allLines));
 
     findCollinearPoints(allLines, allCompleteLines);  // n^2
+
+    allLines.clear();  // clear allLines O(m)
 
     for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {  // n^2logn
         std::stable_sort(allCompleteLines[i].intermediaryPoints.begin(),
