@@ -51,8 +51,10 @@ struct CompleteLine {
 //   av linesegment vi kommer bara beh�va 1 vector och ber�kna slope kan vara en funktion.
 
 std::vector<Point> fileReader(const std::string& filename) {
-    std::filesystem::path points_name =
-        "C:/Github/TND004-Labs/lab3-part2/detectionsystem/data/" + filename;
+ /*   std::filesystem::path points_name =
+        "C:/Github/TND004-Labs/lab3-part2/detectionsystem/data/" + filename;*/
+    std::filesystem::path points_name = data_dir / filename;
+
     std::cout << points_name << '\n';
     std::ifstream pointsFile(points_name);
 
@@ -78,9 +80,10 @@ std::vector<Point> fileReader(const std::string& filename) {
 }
 
 void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
-    std::filesystem::path points_name =
-        "C:/Github/TND004-Labs/lab3-part2/detectionsystem/data/output/segments-" +
-        readFileName;
+    //std::filesystem::path points_name =
+    //    "C:/Github/TND004-Labs/lab3-part2/detectionsystem/data/output/segments-" +
+    //    readFileName;
+    std::filesystem::path points_name = data_dir / "output" / ("segments-" + readFileName);
     std::cout << points_name << '\n';
     std::ofstream out_file(points_name);
     if (!out_file) {
