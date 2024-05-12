@@ -205,8 +205,6 @@ bool operator<(const Point& LeftPoint, const Point& RightPoint) {
  //               vecLinesFromP[i].lines[std::ssize(vecLinesFromP[i].lines) - 1].VP.second);
  //        }
  //        
-
-
  //        if (tempLine[vecCounter].intermediaryPoints.size() >= 3) {
  //           tempLine[vecCounter].slope = calcSlope(tempLine[vecCounter].intermediaryPoints[0],
  //                                                  tempLine[vecCounter].intermediaryPoints[1]);
