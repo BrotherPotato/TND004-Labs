@@ -140,8 +140,7 @@ double calcSlope(Point& start, Point& end) {
 }
 
 // naive implementation of linesegment
-void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLines
-                      /*std::vector<std::pair<double, Point>>& VP*/) {
+void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLines) {
     for (int i = 0; i < std::ssize(PV); i++) {  // O(n)
         LinesFromPoint linesFromP;
         linesFromP.lines.reserve(std::ssize(PV));
@@ -198,7 +197,7 @@ bool operator<(const Point& LeftPoint, const Point& RightPoint) {
                           std::vector<CompleteLine>& CLV) {
      for (int i = 0; i < std::ssize(vecLinesFromP); i++) {  // step through all pointlines O(n)
          std::vector<CompleteLine> tempLine;
-         tempLine.reserve(5); // donno
+         tempLine.reserve(std::ssize(vecLinesFromP)); // donno
          tempLine.push_back(CompleteLine{});
          int vecCounter = 0;
          for (int j = 0; j < std::ssize(vecLinesFromP[i].lines) - 1; j++) {  // O(n) // step through
@@ -287,7 +286,7 @@ int main() try {
 
     std::vector<LinesFromPoint> allLines;
 
-    allLines.reserve(std::ssize(allPoints) * (std::ssize(allPoints)-1));
+    allLines.reserve(std::ssize(allPoints)); // reserve "one piece of space" for each point
 
     cookLineSegments(allPoints, allLines);  // O(n^2)
 
@@ -314,8 +313,8 @@ int main() try {
 
 
     std::vector<CompleteLine> allCompleteLines;
-
-    allCompleteLines.reserve(std::ssize(allLines));
+    // we reserve for the duplicate completed lines
+    allCompleteLines.reserve(std::ssize(allLines) * (std::ssize(allLines)-1)/4);  // total number of line segments is m(m-1), 4 points per complete line
 
     findCollinearPoints(allLines, allCompleteLines);  // n^2
 
