@@ -45,11 +45,7 @@ struct CompleteLine {
     //  double m = 0.0;
 };
 
-// std::vector<std::vector<Point>>
-//
-//   jag hatar denna klass s� mycket. Like varf�r �r det en class som bara hanterar slope och vector
-//   av linesegment vi kommer bara beh�va 1 vector och ber�kna slope kan vara en funktion.
-
+// O(n)
 std::vector<Point> fileReader(const std::string& filename) {
  /*   std::filesystem::path points_name =
         "C:/Github/TND004-Labs/lab3-part2/detectionsystem/data/" + filename;*/
@@ -78,7 +74,7 @@ std::vector<Point> fileReader(const std::string& filename) {
     }
     return points;
 }
-
+// O(m)
 void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
     //std::filesystem::path points_name =
     //    "C:/Github/TND004-Labs/lab3-part2/detectionsystem/data/output/segments-" +
@@ -104,7 +100,7 @@ void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
     }
     out_file.close();
 }
-
+// O(m^2)
 void writeConsole(std::vector<CompleteLine>& lines) {
     int index = 0;
     for (const auto& line : lines) {
@@ -157,18 +153,6 @@ void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLi
     }
 }
 
-//bool operator<(const LineSegment& LeftLineSeg, const LineSegment& RightLineSeg) {  // used in stablesort
-//    if (LeftLineSeg.VP.first == std::numeric_limits<double>::infinity() &&
-//        RightLineSeg.VP.first != std::numeric_limits<double>::infinity()) {
-//        return true;
-//    } else if (RightLineSeg.VP.first == std::numeric_limits<double>::infinity()) {
-//        // om LLP == RLP så är false fortfarande korrekt :))
-//        return false;
-//    }
-//
-//    return LeftLineSeg.VP.first < RightLineSeg.VP.first;
-//}
-
 bool operator<(const Point& LeftPoint, const Point& RightPoint) {
     if (abs(LeftPoint.y - RightPoint.y) < delta) {
 		return LeftPoint.x < RightPoint.x;
@@ -176,78 +160,104 @@ bool operator<(const Point& LeftPoint, const Point& RightPoint) {
     return LeftPoint.y < RightPoint.y;
 }
 
-//bool operator<(const LinesFromPoint& LeftLinePoint, const LinesFromPoint& RightLinePoint) {
-//    if (LeftLinePoint.lines[0].VP.first == std::numeric_limits<double>::infinity() &&
-//        RightLinePoint.lines[0].VP.first != std::numeric_limits<double>::infinity()) {
-//        return true;
-//    } else if (RightLinePoint.lines[0].VP.first == std::numeric_limits<double>::infinity()) {
-//        // om LLP == RLP så är false fortfarande korrekt :))
-//        return false;
-//    }
-//
-//    return LeftLinePoint.lines[0].VP.first < RightLinePoint.lines[0].VP.first;
-//}
-//
-//bool operator<(CompleteLine& LeftLine, CompleteLine& RightLine) {
-//    
-//    return LeftLine.slope < RightLine.slope;
-//}
+// DENNA FUNGERAR
+ //void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
+ //                         std::vector<CompleteLine>& CLV) {
+ //    for (int i = 0; i < std::ssize(vecLinesFromP); i++) {  // step through all pointlines O(n)
+ //        std::vector<CompleteLine> tempLine;
+ //        tempLine.reserve(std::ssize(vecLinesFromP)); // donno
+ //        tempLine.push_back(CompleteLine{});
+ //        int vecCounter = 0;
+ //        for (int j = 0; j < std::ssize(vecLinesFromP[i].lines) - 1; j++) {  // O(n) // step through
+ //           // all lines with the same start point O(n)
+ //           
+ //           auto it1 = vecLinesFromP[i].lines[j].VP;
+ //           auto it2 = vecLinesFromP[i].lines[j + 1].VP;
+ //           tempLine[vecCounter].intermediaryPoints.push_back(it1.second);
+ //           if ((it1.first == std::numeric_limits<double>::infinity() &&
+ //                it2.first == std::numeric_limits<double>::infinity()) ||
+ //               (abs(it1.first - it2.first) < delta)) {
+ //               // we want to add the next point to the line
+ //               
+ //           } else {
+ //               if (tempLine[vecCounter].intermediaryPoints.size() >= 3) {
+ //                   tempLine[vecCounter].slope =
+ //                       calcSlope(tempLine[vecCounter].intermediaryPoints[0],
+ //                                 tempLine[vecCounter].intermediaryPoints[1]);
+ //                   tempLine[vecCounter].intermediaryPoints.push_back(vecLinesFromP[i].start);
+ //                   CLV.push_back(tempLine[vecCounter]);
+ //                   /*vecCounter++;
+ //                   tempLine.push_back(CompleteLine{});*/
+ //               }
+ //               vecCounter++;
+ //               tempLine.push_back(CompleteLine{});
+ //           }
+ //           // if completeLine is last of vecLinesFromP[i].lines
+ //        }
+ //        if ((vecLinesFromP[i].lines[std::ssize(vecLinesFromP[i].lines) - 2].VP.first ==
+ //                 std::numeric_limits<double>::infinity() &&
+ //             vecLinesFromP[i].lines[std::ssize(vecLinesFromP[i].lines) - 1].VP.first ==
+ //                 std::numeric_limits<double>::infinity()) || 
+ //            (abs(tempLine[vecCounter].slope - vecLinesFromP[i].lines[std::ssize(vecLinesFromP[i].lines) - 1].VP.first) <
+ //             delta)) {
+ //           // we want to add the next point to the line
+ //           tempLine[vecCounter].intermediaryPoints.push_back(
+ //               vecLinesFromP[i].lines[std::ssize(vecLinesFromP[i].lines) - 1].VP.second);
+ //        }
+ //        
+
+
+ //        if (tempLine[vecCounter].intermediaryPoints.size() >= 3) {
+ //           tempLine[vecCounter].slope = calcSlope(tempLine[vecCounter].intermediaryPoints[0],
+ //                                                  tempLine[vecCounter].intermediaryPoints[1]);
+ //           tempLine[vecCounter].intermediaryPoints.push_back(vecLinesFromP[i].start);
+ //           CLV.push_back(tempLine[vecCounter]);
+ //        }
+ //    } 
+ //}
 
  void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
                           std::vector<CompleteLine>& CLV) {
      for (int i = 0; i < std::ssize(vecLinesFromP); i++) {  // step through all pointlines O(n)
-         std::vector<CompleteLine> tempLine;
-         tempLine.reserve(std::ssize(vecLinesFromP)); // donno
-         tempLine.push_back(CompleteLine{});
-         int vecCounter = 0;
+         CompleteLine tempLine;
+         
+         tempLine = CompleteLine{};
+         tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start);
+         tempLine.slope = vecLinesFromP[i].lines[0].VP.first;
+         tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[0].VP.second);
+         //double currentSlope = tempLine.slope;
+
          for (int j = 0; j < std::ssize(vecLinesFromP[i].lines) - 1; j++) {  // O(n) // step through
             // all lines with the same start point O(n)
-            
+
             auto it1 = vecLinesFromP[i].lines[j].VP;
             auto it2 = vecLinesFromP[i].lines[j + 1].VP;
-            tempLine[vecCounter].intermediaryPoints.push_back(it1.second);
             if ((it1.first == std::numeric_limits<double>::infinity() &&
                  it2.first == std::numeric_limits<double>::infinity()) ||
                 (abs(it1.first - it2.first) < delta)) {
-                // we want to add the next point to the line
-                
-                
+                tempLine.intermediaryPoints.push_back(it2.second);
 
             } else {
-                if (tempLine[vecCounter].intermediaryPoints.size() >= 3) {
-                    tempLine[vecCounter].slope =
-                        calcSlope(tempLine[vecCounter].intermediaryPoints[0],
-                                  tempLine[vecCounter].intermediaryPoints[1]);
-                    tempLine[vecCounter].intermediaryPoints.push_back(vecLinesFromP[i].start);
-                    CLV.push_back(tempLine[vecCounter]);
-                    /*vecCounter++;
-                    tempLine.push_back(CompleteLine{});*/
+                if (tempLine.intermediaryPoints.size() > 3) {
+
+                    CLV.push_back(tempLine);
+
                 }
-                vecCounter++;
-                tempLine.push_back(CompleteLine{});
+                
+                tempLine = CompleteLine{};
+                tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start);
+                tempLine.slope = vecLinesFromP[i].lines[j+1].VP.first;
+                tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j+1].VP.second);
             }
             // if completeLine is last of vecLinesFromP[i].lines
          }
-         if ((vecLinesFromP[i].lines[std::ssize(vecLinesFromP[i].lines) - 2].VP.first ==
-                  std::numeric_limits<double>::infinity() &&
-              vecLinesFromP[i].lines[std::ssize(vecLinesFromP[i].lines) - 1].VP.first ==
-                  std::numeric_limits<double>::infinity()) || 
-             (abs(tempLine[vecCounter].slope - vecLinesFromP[i].lines[std::ssize(vecLinesFromP[i].lines) - 1].VP.first) <
-              delta)) {
-            // we want to add the next point to the line
-            tempLine[vecCounter].intermediaryPoints.push_back(
-                vecLinesFromP[i].lines[std::ssize(vecLinesFromP[i].lines) - 1].VP.second);
-         }
          
 
+         if (tempLine.intermediaryPoints.size() > 3) {
 
-         if (tempLine[vecCounter].intermediaryPoints.size() >= 3) {
-            tempLine[vecCounter].slope = calcSlope(tempLine[vecCounter].intermediaryPoints[0],
-                                                   tempLine[vecCounter].intermediaryPoints[1]);
-            tempLine[vecCounter].intermediaryPoints.push_back(vecLinesFromP[i].start);
-            CLV.push_back(tempLine[vecCounter]);
+            CLV.push_back(tempLine);
          }
-     } 
+     }
  }
 
 void deleteDuplicates(std::vector<CompleteLine>& allCompleteLines) {
@@ -297,12 +307,6 @@ int main() try {
     for (size_t i = 0; i < std::ssize(allLines); i++) {
         std::stable_sort(allLines[i].lines.begin(), allLines[i].lines.end(),
                          [](const LineSegment& a, const LineSegment& b) -> bool {
-                             /*if (a.VP.first == std::numeric_limits<double>::infinity() &&
-                                 b.VP.first != std::numeric_limits<double>::infinity()) {
-                                 return false;
-                             } else if (b.VP.first == std::numeric_limits<double>::infinity()) {
-                                 return true;
-                             }*/
                              if (abs(a.VP.first - b.VP.first) < delta) {
                                  return a.VP.second < b.VP.second;
                              }
