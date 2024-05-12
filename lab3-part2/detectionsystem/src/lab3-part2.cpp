@@ -329,10 +329,15 @@ int main() try {
     std::stable_sort(allCompleteLines.begin(), allCompleteLines.end(),
                      [](const CompleteLine& a, const CompleteLine& b) -> bool {
                          if (abs(a.intermediaryPoints[0].y - b.intermediaryPoints[0].y) < delta) {
+                             if (abs(a.intermediaryPoints[0].x - b.intermediaryPoints[0].x) < delta ) {
+                                 return a.slope < b.slope;
+                             }
                              return a.intermediaryPoints[0].x < b.intermediaryPoints[0].x;
+
                          }
 
-                         return a.intermediaryPoints[0].y < b.intermediaryPoints[0].y;
+                         return a.intermediaryPoints[0].y < b.intermediaryPoints[0].y; 
+
                      });  // nlogn
 
     // Vi måste ta bort kopior från allcompleteLines
