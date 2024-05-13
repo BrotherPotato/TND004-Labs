@@ -45,10 +45,8 @@ struct CompleteLine {
     //  double m = 0.0;
 };
 
-// O(n)
+// T(n)=O(n) S(n+1)=O(n)
 std::vector<Point> fileReader(const std::string& filename) {
- /*   std::filesystem::path points_name =
-        "C:/Github/TND004-Labs/lab3-part2/detectionsystem/data/" + filename;*/
     std::filesystem::path points_name = data_dir / filename;
 
     std::cout << points_name << '\n';
@@ -60,25 +58,21 @@ std::vector<Point> fileReader(const std::string& filename) {
         return {};
     }
 
-    int n_points{0};
+    int n_points{0}; // S(1)
     pointsFile >> n_points;  // read number of particles
 
     std::vector<Point> points;
-    points.reserve(n_points);
-    for (int i = 0; i < n_points; ++i) {
+    points.reserve(n_points); // T(n)=O(n) S(n)=O(n)
+    for (int i = 0; i < n_points; ++i) { // T(n)=O(n)
         Point temp = Point{};
-        auto& p = points.emplace_back(temp);
+        auto& p = points.emplace_back(temp); // T(1)=O(1)
         pointsFile >> p.x >> p.y;
-        //p.x /= 32767.0;
-        //p.y /= 32767.0;
     }
     return points;
 }
-// O(m)
+
+// T(m)=O(m)
 void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
-    //std::filesystem::path points_name =
-    //    "C:/Github/TND004-Labs/lab3-part2/detectionsystem/data/output/segments-" +
-    //    readFileName;
     std::filesystem::path points_name = data_dir / "output" / ("segments-" + readFileName);
     std::cout << points_name << '\n';
     std::ofstream out_file(points_name);
@@ -86,7 +80,7 @@ void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
         std::cout << "Error opening output file!!\n";
         return;
     }
-    for (const auto& line : lines) {
+    for (const auto& line : lines) { // T(n)=O(m)
         if (line.intermediaryPoints.size() <= 3) {
             continue;
         }
@@ -100,10 +94,10 @@ void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
     }
     out_file.close();
 }
-// O(m^2)
+// T(m*n) = O(m*n) S(1) = O(1)
 void writeConsole(std::vector<CompleteLine>& lines) {
-    int index = 0;
-    for (const auto& line : lines) {
+    int index = 0; // S(1)
+    for (const auto& line : lines) { // T(m)=O(m)
         if (line.intermediaryPoints.size() < 3) {
             continue;
         }
@@ -111,7 +105,7 @@ void writeConsole(std::vector<CompleteLine>& lines) {
                   << ","
                   << line.intermediaryPoints[0].y << ")";
 
-        for (size_t i = 1; i < std::ssize(line.intermediaryPoints); i++) {
+        for (size_t i = 1; i < std::ssize(line.intermediaryPoints); i++) { // T(n)=O(n)
             std::cout << "->(" << line.intermediaryPoints[i].x << ","
                       << line.intermediaryPoints[i].y << ")";
         }
@@ -121,6 +115,7 @@ void writeConsole(std::vector<CompleteLine>& lines) {
     }
 }
 
+// T(1)=O(1) S(2)=O(1)
 double calcSlope(Point& start, Point& end) {
     // double temp = (end.y - start.y) / (end.x - start.x);
     double num = end.y - start.y;
@@ -135,24 +130,24 @@ double calcSlope(Point& start, Point& end) {
     return num / den;
 }
 
-// naive implementation of linesegment
-void cookLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLines) {
-    for (int i = 0; i < std::ssize(PV); i++) {  // O(n)
+// T(2n^2) = O(n) S(n) = O(n)
+void createLineSegments(std::vector<Point>& PV, std::vector<LinesFromPoint>& allLines) {
+    for (int i = 0; i < std::ssize(PV); i++) {  // T(n)      S(n) from reserve
         LinesFromPoint linesFromP;
-        linesFromP.lines.reserve(std::ssize(PV));
+        linesFromP.lines.reserve(std::ssize(PV)); // T(n)
         linesFromP.start = PV[i];
-        for (int j = 0; j < std::ssize(PV); j++) {  // O(n)
+        for (int j = 0; j < std::ssize(PV); j++) {  // T(n)
             if (i == j) continue;
             LineSegment tempo;
-            tempo.VP.first = calcSlope(PV[i], PV[j]);
+            tempo.VP.first = calcSlope(PV[i], PV[j]); // O(1)
             tempo.VP.second = PV[j];
             // linesFromP.slope = tempo.VP.first;
-            linesFromP.lines.push_back(tempo);
+            linesFromP.lines.push_back(tempo); // T(1)
         }
         allLines.push_back(linesFromP);
     }
 }
-
+// T(1) = O(1) S(1) = O(1)
 bool operator<(const Point& LeftPoint, const Point& RightPoint) {
     if (abs(LeftPoint.y - RightPoint.y) < delta) {
 		return LeftPoint.x < RightPoint.x;
@@ -214,57 +209,55 @@ bool operator<(const Point& LeftPoint, const Point& RightPoint) {
  //    } 
  //}
 
+// T(2n*(n-1)) = O(n^2)  S(n) = O(n)
  void findCollinearPoints(std::vector<LinesFromPoint>& vecLinesFromP,
                           std::vector<CompleteLine>& CLV) {
-     for (int i = 0; i < std::ssize(vecLinesFromP); i++) {  // step through all pointlines O(n)
+     for (int i = 0; i < std::ssize(vecLinesFromP); i++) {  // step through all pointlines T(n) 
          CompleteLine tempLine;
          
          tempLine = CompleteLine{};
-         tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start);
+         tempLine.intermediaryPoints.reserve(std::ssize(vecLinesFromP)); // T(n) S(n)
+         tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start); 
          tempLine.slope = vecLinesFromP[i].lines[0].VP.first;
          tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[0].VP.second);
          //double currentSlope = tempLine.slope;
 
-         for (int j = 0; j < std::ssize(vecLinesFromP[i].lines) - 1; j++) {  // O(n) // step through
-            // all lines with the same start point O(n)
-
-            auto it1 = vecLinesFromP[i].lines[j].VP;
-            auto it2 = vecLinesFromP[i].lines[j + 1].VP;
+         for (int j = 0; j < std::ssize(vecLinesFromP[i].lines) - 1; j++) {  // T(n-1) n-1 lines to all other points
+            auto it1 = vecLinesFromP[i].lines[j].VP;    // S(1)
+            auto it2 = vecLinesFromP[i].lines[j + 1].VP; // S(1)
+            // we either add the point from the line to the vector or we start a new line
             if ((it1.first == std::numeric_limits<double>::infinity() &&
                  it2.first == std::numeric_limits<double>::infinity()) ||
-                (abs(it1.first - it2.first) < delta)) {
-                tempLine.intermediaryPoints.push_back(it2.second);
+                (abs(it1.first - it2.first) < delta)) { 
+                tempLine.intermediaryPoints.push_back(it2.second); // T(1)
 
-            } else {
-                if (tempLine.intermediaryPoints.size() > 3) {
-
-                    CLV.push_back(tempLine);
-
+            } else { 
+                if (tempLine.intermediaryPoints.size() > 3) { // if we have more than 3 points in the line
+                    CLV.push_back(tempLine); // T(1)
                 }
                 
                 tempLine = CompleteLine{};
-                tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start);
+                tempLine.intermediaryPoints.push_back(vecLinesFromP[i].start); // T(1)
                 tempLine.slope = vecLinesFromP[i].lines[j+1].VP.first;
-                tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j+1].VP.second);
+                tempLine.intermediaryPoints.push_back(vecLinesFromP[i].lines[j+1].VP.second); // T(1)
             }
-            // if completeLine is last of vecLinesFromP[i].lines
          }
-         
-
+         // if completeLine is last of vecLinesFromP[i].lines
          if (tempLine.intermediaryPoints.size() > 3) {
-
-            CLV.push_back(tempLine);
+            CLV.push_back(tempLine); // T(1)
          }
      }
  }
-
+ // we are not really sure if we sould write max(m*n, m^2) or m*n or m^2 since m*n is large if m<n and m^2 is large if m>n
+ // T(max(m*n, m^2)) = O(max(m*n, m^2)) S(m) = O(m)
 void deleteDuplicates(std::vector<CompleteLine>& allCompleteLines) {
-    std::vector<bool> duplicates(allCompleteLines.size(), false);
-    for (int i = 0; i < std::ssize(allCompleteLines) - 1; i++) {
+    std::vector<bool> duplicates(allCompleteLines.size(), false); // S(m)
+    // This block of code is T(m*n)
+    for (int i = 0; i < std::ssize(allCompleteLines) - 1; i++) {  // T(m)
         if ((abs(allCompleteLines[i].slope - allCompleteLines[i + 1].slope) < delta) ||
             (allCompleteLines[i].slope == std::numeric_limits<double>::infinity() &&
              allCompleteLines[i + 1].slope == std::numeric_limits<double>::infinity())) {
-            for (size_t j = 0; j < std::ssize(allCompleteLines[i].intermediaryPoints);
+            for (size_t j = 0; j < std::ssize(allCompleteLines[i].intermediaryPoints); // T(n)
                  j++) {  // step through the first line
                 if (abs(allCompleteLines[i].intermediaryPoints[j].x -
                         allCompleteLines[i + 1].intermediaryPoints[0].x) < delta &&
@@ -275,14 +268,14 @@ void deleteDuplicates(std::vector<CompleteLine>& allCompleteLines) {
             }
         }
     }
-
-    for (int i = std::ssize(allCompleteLines) - 1; i > 0; i--) {
+    // This block of code is T(m^2)
+    for (int i = std::ssize(allCompleteLines) - 1; i > 0; i--) {  // T(m)
         if (duplicates[i]) {
-            allCompleteLines.erase(allCompleteLines.begin() + i);
+            allCompleteLines.erase(allCompleteLines.begin() + i); // T(m)
         }
     }
 }
-
+// n is the number of points, m is the number of lines
 int main() try {
     std::cout << "Enter the name of input points file: ";
     std::string s;
@@ -290,22 +283,21 @@ int main() try {
 
     std::vector<Point> allPoints = fileReader(s);  // O(n)
 
-    std::sort(allPoints.begin(), allPoints.end());  
+    std::sort(allPoints.begin(), allPoints.end());  // O(n*log(n))
 
     std::vector<LinesFromPoint> allLines;
 
-    allLines.reserve(std::ssize(allPoints)); // reserve "one piece of space" for each point
+    allLines.reserve(std::ssize(allPoints)); // reserve "one piece of space" for each point S(n)=O(n)
 
-    cookLineSegments(allPoints, allLines);  // O(n^2)
+    createLineSegments(allPoints, allLines);  // T(2n^2) = O(n) S(n) = O(n)
 
     allPoints.clear();  // clear allPoints O(n)
 
-    // sort lines by slope 2. in pdf
-
-    for (size_t i = 0; i < std::ssize(allLines); i++) {
-        std::stable_sort(allLines[i].lines.begin(), allLines[i].lines.end(),
+    // sort lines by slope T(n^2*log(n)) = O(n^2*log(n)) S(1) = O(1)
+    for (size_t i = 0; i < std::ssize(allLines); i++) { // n
+        std::stable_sort(allLines[i].lines.begin(), allLines[i].lines.end(), // n*log(n)
                          [](const LineSegment& a, const LineSegment& b) -> bool {
-                             if (abs(a.VP.first - b.VP.first) < delta) {
+                             if (abs(a.VP.first - b.VP.first) < delta) { // S(1)
                                  return a.VP.second < b.VP.second;
                              }
 
@@ -316,12 +308,15 @@ int main() try {
 
     std::vector<CompleteLine> allCompleteLines;
     // we reserve for the duplicate completed lines
-    allCompleteLines.reserve(std::ssize(allLines) * (std::ssize(allLines)-1)/4);  // total number of line segments is m(m-1), 4 points per complete line
+    // T(n) = O(n) S(n^2) = O(n^2) // we use n since the size of allLines is the same as the number of points
+    allCompleteLines.reserve(std::ssize(allLines) * (std::ssize(allLines)-1)/4);  // total number of line segments is n(n-1), 4 points per complete line
 
-    findCollinearPoints(allLines, allCompleteLines);  // n^2
+    findCollinearPoints(allLines, allCompleteLines);  // T(2n*(n-1)) = O(n^2)  S(n) = O(n)
 
     allLines.clear();  // clear allLines O(m)
 
+    // use n since we sort by points
+    // T(n^2*log(n)) = O(n^2*log(n)) S(1) = O(1)
     for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {  // n^2logn
         std::stable_sort(allCompleteLines[i].intermediaryPoints.begin(),
                          allCompleteLines[i].intermediaryPoints.end(),
@@ -333,8 +328,9 @@ int main() try {
                              return a.y < b.y;
                          });
     }
-
-    std::stable_sort(allCompleteLines.begin(), allCompleteLines.end(), // nlogn
+    // use m sice we sort by lines
+    // T(m*log(m)) = O(m*log(m)) S(1) = O(1)
+    std::stable_sort(allCompleteLines.begin(), allCompleteLines.end(), // mlogm
                      [](const CompleteLine& a, const CompleteLine& b) -> bool {
                          if (abs(a.intermediaryPoints[0].y - b.intermediaryPoints[0].y) < delta) {
                              if (abs(a.intermediaryPoints[0].x - b.intermediaryPoints[0].x) < delta ) {
@@ -349,7 +345,7 @@ int main() try {
                      });  
 
     // Vi måste ta bort kopior från allcompleteLines
-    deleteDuplicates(allCompleteLines);
+    deleteDuplicates(allCompleteLines); // T(max(m*n, m^2)) = O(max(m*n, m^2)) S(m) = O(m)
 
     writeFile(allCompleteLines, s);
 
