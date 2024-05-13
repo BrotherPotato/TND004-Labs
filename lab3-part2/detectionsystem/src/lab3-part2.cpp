@@ -69,8 +69,8 @@ std::vector<Point> fileReader(const std::string& filename) {
         Point temp = Point{};
         auto& p = points.emplace_back(temp);
         pointsFile >> p.x >> p.y;
-        p.x /= 32767.0;
-        p.y /= 32767.0;
+        //p.x /= 32767.0;
+        //p.y /= 32767.0;
     }
     return points;
 }
@@ -91,11 +91,11 @@ void writeFile(std::vector<CompleteLine>& lines, std::string readFileName) {
             continue;
         }
 
-        out_file << line.intermediaryPoints[0].x * 32767.0 << " "
-                 << line.intermediaryPoints[0].y * 32767.0 << " "
-                 << line.intermediaryPoints[std::ssize(line.intermediaryPoints) - 1].x * 32767.0
+        out_file << line.intermediaryPoints[0].x << " "
+                 << line.intermediaryPoints[0].y << " "
+                 << line.intermediaryPoints[std::ssize(line.intermediaryPoints) - 1].x 
                  << " "
-                 << line.intermediaryPoints[std::ssize(line.intermediaryPoints) - 1].y * 32767.0
+                 << line.intermediaryPoints[std::ssize(line.intermediaryPoints) - 1].y
                  << std::endl;
     }
     out_file.close();
@@ -107,13 +107,13 @@ void writeConsole(std::vector<CompleteLine>& lines) {
         if (line.intermediaryPoints.size() < 3) {
             continue;
         }
-        std::cout << index << ": " << line.slope << ": (" << line.intermediaryPoints[0].x * 32767.0
+        std::cout << index << ": " << line.slope << ": (" << line.intermediaryPoints[0].x 
                   << ","
-                  << line.intermediaryPoints[0].y * 32767.0 << ")";
+                  << line.intermediaryPoints[0].y << ")";
 
         for (size_t i = 1; i < std::ssize(line.intermediaryPoints); i++) {
-            std::cout << "->(" << line.intermediaryPoints[i].x * 32767.0 << ","
-                      << line.intermediaryPoints[i].y * 32767.0 << ")";
+            std::cout << "->(" << line.intermediaryPoints[i].x << ","
+                      << line.intermediaryPoints[i].y << ")";
         }
 
         std::cout << '\n';
