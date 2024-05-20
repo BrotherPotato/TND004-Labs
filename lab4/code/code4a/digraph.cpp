@@ -197,13 +197,13 @@ void Digraph::printPath(int t) const {
 	printRecursivePath(path[t]);
 
 	// handle dist after last recursion
-	std::cout << "(" << dist[t] << ")";
+	std::cout << "->" << std::format("{:2} ", t) << " (" << dist[t] << ") ";
 }
 
 void Digraph::printRecursivePath(int t) const {
 	// case for the last vertex
 	if (path[t] == 0) {
-		std::cout << t;
+		std::cout << " " << t << " ";
 		return;
 	}
 	printRecursivePath(path[t]);
