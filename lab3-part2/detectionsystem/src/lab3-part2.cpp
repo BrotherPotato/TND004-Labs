@@ -316,8 +316,8 @@ int main() try {
     allLines.clear();  // clear allLines O(m)
 
     // use n since we sort by points
-    // T(n^2*log(n)) = O(n^2*log(n)) S(1) = O(1)
-    for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {  // n^2logn
+    // T(m*n*log(n)) = O(m*n*log(n)) S(1) = O(1)
+    for (size_t i = 0; i < std::ssize(allCompleteLines); i++) {  // m*n*logn
         std::stable_sort(allCompleteLines[i].intermediaryPoints.begin(),
                          allCompleteLines[i].intermediaryPoints.end(),
                          [](const Point& a, const Point& b) -> bool {
